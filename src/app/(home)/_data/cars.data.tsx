@@ -140,7 +140,7 @@ export const cars: Car[] = [
   },
   {
     id: 5,
-    imageUrl: "/toyota-yaris_ativ.png",
+    imageUrl: "/toyota_yaris_ativ.png",
     name: "Toyota Yaris Ativ",
     carBodyType: "Sedan",
     pricePerDay: 725,

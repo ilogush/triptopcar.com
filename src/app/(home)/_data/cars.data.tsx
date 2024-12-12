@@ -488,7 +488,7 @@ export const cars: Car[] = [
     ],
   },
 {
-    id: 15,
+    id: 16,
     imageUrl: "/toyota_majesty.png",
     name: "Toyota Majesty",
     carBodyType: "Pickup",

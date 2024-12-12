@@ -50,7 +50,7 @@ const CarCard: React.FC<CarCardProps> = ({ className, car }) => {
                     <rect x="5.5" y="17.5" width="2" height="1" rx="0.5" stroke="black"></rect>
                     <rect x="5.5" y="11.5" width="2" height="1" rx="0.5" stroke="black"></rect>
                   </svg>{" "}
-                  Automatic
+                  {car.transmissionType}
                 </span>
                 <span className="flex gap-1">
                   <svg
@@ -83,7 +83,7 @@ const CarCard: React.FC<CarCardProps> = ({ className, car }) => {
                     ></path>
                     <rect x="19.5" y="9.5" width="1" height="3" rx="0.5" stroke="black"></rect>
                   </svg>{" "}
-                  Gasoline A95
+                  {car.fuelType}
                 </span>
                 <span className="flex gap-1">
                   <svg
@@ -137,7 +137,7 @@ const CarCard: React.FC<CarCardProps> = ({ className, car }) => {
                       </clipPath>
                     </defs>
                   </svg>{" "}
-                  4
+                  {car.seatsQuantity} seats
                 </span>
                 <span className="flex gap-1">
                   <svg
@@ -200,7 +200,7 @@ const CarCard: React.FC<CarCardProps> = ({ className, car }) => {
                       stroke="black"
                     ></rect>
                   </svg>{" "}
-                  1.5L
+                 {car.engineCapacity}
                 </span>
                 <span className="flex gap-1">
                   <svg
@@ -226,7 +226,7 @@ const CarCard: React.FC<CarCardProps> = ({ className, car }) => {
                       stroke="black"
                     ></rect>
                   </svg>{" "}
-                  2021
+                  {car.year}
                 </span>
               </div>
             </div>

@@ -286,7 +286,7 @@ export const cars: Car[] = [
 
   {
     id: 10,
-    imageUrl: "/chevrolet-captiva.png",
+    imageUrl: "/chevrolet_captiva.png",
     name: "Chevrolet Captiva",
     carBodyType: "SUV",
     pricePerDay: 850,
@@ -411,6 +411,93 @@ export const cars: Car[] = [
     seatsQuantity: 7,
     deposit: 10000,
     year: "2023",
+    transmissionType: "Automatic",
+    reviews: [
+      {
+        id: 1,
+        name: "David Sarokovich",
+        review:
+          "Toyota Fortuner is the most powerful car from diesel SUVs in this company. There was a large company of us and we did not even consider other rental options, since we visit Thailand every year and already had experience renting other models of cars. I recommend everyone who wants a powerful car to choose and specifically Toyota Fortuner.",
+        rating: 5,
+      },
+      {
+        id: 2,
+        name: "Robert V.",
+        review:
+          "We had to rent a Toyota Fortuner and for the locationVilla on a steep hill.Some taxis in the daughterCould not afford to go up our steep hill and bring us to what was quite uncomfortable.Toyota Fortuner coped with this task perfectly and we are grateful to the service for its prompt work and delivery of the car despite the late hour. Thank you very much!",
+        rating: 5,
+      },
+    ],
+  },
+{
+    id: 14,
+    imageUrl: "/ford_ranger.png",
+    name: "Ford Ranger",
+    carBodyType: "Pickup",
+    pricePerDay: 950,
+    engineCapacity: "2.0 Turbo",
+    fuelType: "Diesel",
+    seatsQuantity: 5,
+    deposit: 10000,
+    year: "2024",
+    transmissionType: "Automatic",
+    reviews: [
+      {
+        id: 1,
+        name: "David Sarokovich",
+        review:
+          "Toyota Fortuner is the most powerful car from diesel SUVs in this company. There was a large company of us and we did not even consider other rental options, since we visit Thailand every year and already had experience renting other models of cars. I recommend everyone who wants a powerful car to choose and specifically Toyota Fortuner.",
+        rating: 5,
+      },
+      {
+        id: 2,
+        name: "Robert V.",
+        review:
+          "We had to rent a Toyota Fortuner and for the locationVilla on a steep hill.Some taxis in the daughterCould not afford to go up our steep hill and bring us to what was quite uncomfortable.Toyota Fortuner coped with this task perfectly and we are grateful to the service for its prompt work and delivery of the car despite the late hour. Thank you very much!",
+        rating: 5,
+      },
+    ],
+  },
+{
+    id: 15,
+    imageUrl: "/toyota_hilux.png",
+    name: "Toyota Hilux",
+    carBodyType: "Pickup",
+    pricePerDay: 900,
+    engineCapacity: "2.8 Be Turbo",
+    fuelType: "Diesel",
+    seatsQuantity: 5,
+    deposit: 10000,
+    year: "2024",
+    transmissionType: "Automatic",
+    reviews: [
+      {
+        id: 1,
+        name: "David Sarokovich",
+        review:
+          "Toyota Fortuner is the most powerful car from diesel SUVs in this company. There was a large company of us and we did not even consider other rental options, since we visit Thailand every year and already had experience renting other models of cars. I recommend everyone who wants a powerful car to choose and specifically Toyota Fortuner.",
+        rating: 5,
+      },
+      {
+        id: 2,
+        name: "Robert V.",
+        review:
+          "We had to rent a Toyota Fortuner and for the locationVilla on a steep hill.Some taxis in the daughterCould not afford to go up our steep hill and bring us to what was quite uncomfortable.Toyota Fortuner coped with this task perfectly and we are grateful to the service for its prompt work and delivery of the car despite the late hour. Thank you very much!",
+        rating: 5,
+      },
+    ],
+  },
+{
+    id: 15,
+    imageUrl: "/toyota_majesty.png",
+    name: "Toyota Majesty",
+    carBodyType: "Pickup",
+    pricePerDay: 1200,
+    engineCapacity: "3.0 Turbo",
+    fuelType: "Diesel",
+    seatsQuantity: 11,
+    deposit: 15000,
+    year: "2024",
     transmissionType: "Automatic",
     reviews: [
       {

@@ -430,7 +430,7 @@ export const cars: Car[] = [
     ],
   },
 {
-    id: 14,
+    id: 17,
     imageUrl: "/ford_ranger.png",
     name: "Ford Ranger",
     carBodyType: "Pickup",

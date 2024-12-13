@@ -79,6 +79,7 @@ const BookingSidebar: React.FC<BookingSidebarProps> = React.memo(({ className, c
     const calculatedPrice = calculateDailyCost(
       startDate ? new Date(startDate) : new Date(),
       car.pricePerDay,
+      car.premiumExtraPrice,
       false,
       isPremium,
     );

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import TransmissionIcon from "@/components/icons/transmission-icon";
 import { Car } from "@/typing/interfaces";
 import SeatIcon from "@/components/icons/seat-icon";
@@ -26,17 +26,19 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
   const daysQuantity = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
   const [timeStart, setTimeStart] = useState<string>(params.get("timeStart") ?? "10:00");
   const [timeEnd, setTimeEnd] = useState<string>(params.get("timeEnd") ?? "10:00");
-  const [dayTotal, setDayTotal] = useState(0);
 
   const getCarBookingLink = useCallback(() => {
     return `/booking/${car.id}?startDate=${startDate}&endDate=${endDate}&timeStart=${timeStart}&timeEnd=${timeEnd}&isPremium=${isPremium}&locationFrom=${locationFrom}&locationTo=${locationTo}`;
   }, [isPremium, startDate, endDate, timeStart, timeEnd, locationFrom, locationTo]);
 
-  useEffect(() => {
-    // Ensure calculateDailyCost returns a number
-    const calculatedPrice = calculateDailyCost(startDate ? new Date(startDate) : new Date(), car.pricePerDay, false, isPremium);
-    setDayTotal(calculatedPrice);
-  }, [car.pricePerDay, startDate, isPremium]); // Depend on car.pricePerDay and startDate
+  const dayTotal = calculateDailyCost(
+    startDate ? new Date(startDate) : new Date(),
+    car.pricePerDay,
+    car.premiumExtraPrice,
+    false,
+    isPremium,
+  );
+
   return (
     <article>
       <div
@@ -111,9 +113,9 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
             href={getCarBookingLink()}
             className="flex w-min items-center rounded-lg bg-brand-base px-4 py-2 text-white ml-auto"
             onClick={(e) => {
-                console.log("Link clicked!");
-                // Убедитесь, что preventDefault() не используется здесь
-              }}
+              console.log("Link clicked!");
+              // Убедитесь, что preventDefault() не используется здесь
+            }}
           >
             Book <span className="text-lg ml-2">{">"}</span>
           </Link>
@@ -123,9 +125,10 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
         <StandartConditions isPremium={isPremium} setIsPremium={setIsPremium} />
         <hr className="h-full w-full bg-tertiary-gray" />
         <PremiumConditions
-          isChoosed={isPremium}
+          car={car}
+          isSelected={isPremium}
           onCancel={() => setIsPremium(false)}
-          onChoose={() => setIsPremium(true)}
+          onSelect={() => setIsPremium(true)}
         />
 
         <div className=" pl-10 pr-10 max-md:flex sm:hidden gap-4 justify-between items-start space-y-2 md:py-8 max-md:mb-4">
@@ -160,8 +163,8 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
             href={getCarBookingLink()}
             className="flex w-min items-center rounded-lg bg-brand-base px-4 py-2 text-white ml-auto"
             onClick={(e) => {
-                console.log("Generated link:", getCarBookingLink());
-              }}
+              console.log("Generated link:", getCarBookingLink());
+            }}
           >
             Book <span className="text-lg ml-2">{">"}</span>
           </Link>

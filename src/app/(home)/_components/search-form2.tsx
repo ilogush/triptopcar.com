@@ -14,6 +14,7 @@ import Select, { DropdownIndicatorProps } from "react-select";
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import { areas } from "../_data/areas.data";
+import SearchIcon from "@/components/icons/search-icon";
 
 const searchFormSchema = z.object({
   locationTo: z.number(),
@@ -215,7 +216,10 @@ const SearchForm2: FC = () => {
           <div className="col-span-2 lg:col-span-2 sm:col-span-2">
             <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">&nbsp;</p>
             <button type="submit" className="bg-brand-base text-white h-[50px] px-6 rounded-lg w-full">
-              Search
+              <div className="flex justify-center gap-2">
+                <SearchIcon />
+                Search
+              </div>
             </button>
           </div>
         </div>

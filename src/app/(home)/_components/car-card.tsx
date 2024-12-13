@@ -49,7 +49,7 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
           <Image src={car.imageUrl} alt={`${car.name} Image`} className="object-contain" sizes="100%, 100%" fill />
         </div>
         <div className="flex flex-col items-start md:py-8">
-          <div className="col-span-2 flex items-center justify-between max-md:mx-auto">
+          <div className="col-span-2 flex items-center justify-between">
             <h3>
               <Link href={getCarBookingLink()}>
                 <span className="bg-base-bg-blue mr-4 rounded-sm px-2 py-1.5 text-sm">
@@ -59,7 +59,7 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
               </Link>
             </h3>
           </div>
-          <div className="mt-6 mb-4 grid grid-cols-2 gap-2 max-md:mx-auto">
+          <div className="mt-6 mb-4 grid grid-cols-2 gap-2 ">
             <span className="flex items-center gap-1">
               <TransmissionIcon className="w-6 h-6" /> {car.transmissionType}
             </span>
@@ -142,7 +142,7 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
               </span>
               <span>per day</span>
             </p>
-            <p className="text-base-black-secondary flex items-center justify-start max-xl:justify-start gap-2 text-sm text-nowrap -translate-y-2">
+            <p className="text-base-black-secondary flex items-center justify-start max-xl:justify-start gap-2 text-sm text-nowrap -translate-y-2 py-2">
               <span>
                 Total:{" "}
                 {(() => {

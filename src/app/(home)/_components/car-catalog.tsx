@@ -54,8 +54,16 @@ const CarCatalog = () => {
     <>
       <div className="rounded-2xl bg-white p-3">
         <ul className="flex gap-8 max-xl:gap-2 font-bold uppercase *:grid *:basis-full *:place-items-center *:rounded-sm *:border *:border-tertiary-gray *:p-2 max-[600px]:grid max-[600px]:grid-cols-3 max-[600px]:px-20 max-[500px]:px-0 max-[425px]:grid-cols-3">
-          <li className={clsx("max-xl:scale-90")}>
-            <button className="w-full h-full" onClick={() => setCarTypesFilter([])}>
+          <li
+            className={clsx(
+              carTypesFilter.length === 0 && "bg-tertiary-gray",
+              "max-xl:scale-90 max-md:w-full max-md:h-full",
+            )}
+          >
+            <button
+              className="w-full h-full aspect-square justify-center flex items-center gap-4 flex-col text-slate-800"
+              onClick={() => setCarTypesFilter([])}
+            >
               All
             </button>
           </li>

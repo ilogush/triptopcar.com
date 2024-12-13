@@ -124,7 +124,7 @@ const SearchForm2: FC = () => {
             />
           </div>
           <div className="col-span-1 lg:col-span-2 sm:col-span-1">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Pick-up date start</p>
+            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Pick-up date</p>
             <Controller
               name="startDate"
               control={form.control}
@@ -184,7 +184,7 @@ const SearchForm2: FC = () => {
             />
           </div>
           <div className="col-span-1 lg:col-span-2 sm:col-span-1">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Drop-off date start</p>
+            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Drop-off date</p>
             <DatePicker
               className="w-full h-[50px]"
               clearIcon={null}

@@ -45,11 +45,11 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
           className,
         )}
       >
-        <div className="row-span-3 relative w-[400px] max-md:w-full max-md:h-[300px] max-xl:w-full max-[500px]:h-[200px]">
-          <Image src={car.imageUrl} alt={`${car.name} Image`} className="object-contain" sizes="100%, 100%" fill />
+        <div className="row-span-2 relative w-[400px] max-md:w-full max-md:h-[300px] max-xl:w-full max-[500px]:h-[200px]">
+          <Image src={car.imageUrl} alt={`${car.name} Image`} className="object-contain" sizes="100% 100%" fill />
         </div>
         <div className="flex flex-col items-start md:py-8">
-          <div className="col-span-2 flex items-center justify-between">
+          <div className="">
             <h3>
               <Link href={getCarBookingLink()}>
                 <span className="bg-base-bg-blue mr-4 rounded-sm px-2 py-1.5 text-sm">

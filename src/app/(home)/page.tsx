@@ -19,7 +19,7 @@ export default async function HomePage() {
               className="w-full rounded-t-2xl"
             />
             <div className="relative w-full h-full p-4 flex flex-col items-end">
-              <div className="h-full w-full text-justify">
+              <div className="h-full w-full text-left pb-2">
                 Medical insurance to Thailand and 21 other countries with
                 insurance coverage of USD 100,000 for only USD 300 per year.
                 Your reliable protection against accidents and illnesses abroad

@@ -22,14 +22,13 @@ export function useTotalPrice({
   dropoffLocationId: number;
 }) {
   const dailyRate = car.pricePerDay; // Базовая стоимость за день
-  //const deposit = car.deposit; // Возвратный депозит
+  const deposit = car.deposit; // Возвратный депозит
 
   // Вычисляем стоимость аренды
   const baseRentalFee = calculateRentCost(startDate, endDate, dailyRate, includeChildSeat);
 
   // Премиальная страховка (опционально)
-  const premiumPrice = car.premiumExtraPrice ?? 400;
-  const insuranceFee = isPremium ? premiumPrice * daysQuantity : 0;
+  const insuranceFee = isPremium ? 400 * daysQuantity : 0;
 
   // Стоимость доставки за пункты выдачи и возврата
   const pickupLocation = areas.find((area) => area.id === pickupLocationId);

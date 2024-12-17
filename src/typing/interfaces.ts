@@ -13,7 +13,6 @@ export interface Car {
   deposit: number;
   carBodyType: CarBodyType["name"];
   pricePerDay: number;
-  premiumExtraPrice?: number;
   engineCapacity: string;
   year: string;
   fuelType: "Gasoline A95" | "Diesel" | "Electric";

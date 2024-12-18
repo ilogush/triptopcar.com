@@ -15,36 +15,44 @@ export interface Review {
   created_at: string;
 }
 
-// Define a type for the expected params
-interface Params {
-  id: string;
+// Определяем тип для ожидаемых параметров
+type Params = Promise<{ id: string }>;
+
+// Обновляем BookingIdProps для ожидания params как Promise
+interface BookingIdProps {
+  params: Params;
 }
 
-export default function BookingId({ params }: { params: Params }) {
-  const [id, setId] = useState<number | null>(null);
+export default async function BookingId({ params }: BookingIdProps) {
+  const { id } = await params; // Ожидаем параметры, чтобы получить значение id
+  const [idNumber, setId] = useState<number | null>(null);
   const [car, setCar] = useState<Car | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const idNumber = Number(params.id); // Convert the ID to number
-    setId(idNumber); // Set the id state
-  }, [params]);
+    const idNum = Number(id); // Преобразуем ID в число
+    if (isNaN(idNum)) {
+      setError("Invalid car ID");
+      return;
+    }
+    setId(idNum); // Устанавливаем состояние id
+  }, [id]);
 
   useEffect(() => {
-    if (id === null) return; // Wait until id is resolved
+    if (idNumber === null) return; // Ждем, пока id будет установлен
 
     const fetchData = async () => {
       setLoading(true);
       try {
-        const carRes = await fetch(`/api/cars/${id}`);
+        const carRes = await fetch(`/api/cars/${idNumber}`);
         if (!carRes.ok) throw new Error("Failed to fetch car");
 
         const carData = await carRes.json();
         setCar(carData);
 
-        const reviewsRes = await fetch(`/api/reviews?car_id=${id}`);
+        const reviewsRes = await fetch(`/api/reviews?car_id=${idNumber}`);
         if (!reviewsRes.ok) throw new Error("Failed to fetch reviews");
 
         const reviewsData = await reviewsRes.json();
@@ -57,7 +65,7 @@ export default function BookingId({ params }: { params: Params }) {
     };
 
     fetchData();
-  }, [id]);
+  }, [idNumber]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;

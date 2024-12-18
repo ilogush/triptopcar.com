@@ -15,33 +15,43 @@ export interface Review {
   created_at: string;
 }
 
-// Определяем тип для ожидаемых параметров
-type Params = Promise<{ id: string }>;
-
-// Обновляем BookingIdProps для ожидания params как Promise
+// Обновляем интерфейс для пропсов компонента
 interface BookingIdProps {
-  params: Params;
+  params: Promise<{ id: string }>; // Параметры передаются как Promise
 }
 
-export default async function BookingId({ params }: BookingIdProps) {
-  const { id } = await params; // Ожидаем параметры, чтобы получить значение id
-  const [idNumber, setId] = useState<number | null>(null);
+export default function BookingId({ params }: BookingIdProps) {
+  const [id, setId] = useState<string | null>(null);
+  const [idNumber, setIdNumber] = useState<number | null>(null);
   const [car, setCar] = useState<Car | null>(null);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Распаковываем params
+    params
+      .then((resolvedParams) => {
+        setId(resolvedParams.id);
+      })
+      .catch(() => {
+        setError("Failed to load params");
+      });
+  }, [params]);
+
+  useEffect(() => {
+    if (!id) return;
+
     const idNum = Number(id); // Преобразуем ID в число
     if (isNaN(idNum)) {
       setError("Invalid car ID");
       return;
     }
-    setId(idNum); // Устанавливаем состояние id
+    setIdNumber(idNum); // Устанавливаем состояние для idNumber
   }, [id]);
 
   useEffect(() => {
-    if (idNumber === null) return; // Ждем, пока id будет установлен
+    if (idNumber === null) return;
 
     const fetchData = async () => {
       setLoading(true);

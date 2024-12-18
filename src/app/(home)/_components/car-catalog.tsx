@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Select from "react-select";
-import CarCard from "./car-card";
-import { Car, CarBodyType } from "@/typing/interfaces";
+import CarCard, { Car } from "./car-card";
+import {  CarBodyType } from "@/typing/interfaces";
 import { carTypes } from "../_data/carTypes.data";
-import { cars } from "../_data/cars.data";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
 
@@ -32,23 +31,58 @@ const defaultSort: Option = sortOptions[0];
 type SortHandler = (a: Car, b: Car) => number;
 
 const sortHandlers: Record<SortOption, SortHandler> = {
-  "price-low-to-high": (a: Car, b: Car) => a.pricePerDay - b.pricePerDay,
-  "price-high-to-low": (a: Car, b: Car) => b.pricePerDay - a.pricePerDay,
+  "price-low-to-high": (a: Car, b: Car) => a.price_per_day - b.price_per_day,
+  "price-high-to-low": (a: Car, b: Car) => b.price_per_day - a.price_per_day,
 };
 
 const CarCatalog = () => {
   const [carTypesFilter, setCarTypesFilter] = useState<CarBodyType[]>([]);
   const [sort, setSort] = useState<Option | null>(defaultSort);
+  const [cars, setCars] = useState<Car[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Загружаем данные с API
+  useEffect(() => {
+    const fetchCars = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch("/api/cars"); // Ваш API-эндпоинт
+        if (!res.ok) {
+          throw new Error("Failed to fetch cars");
+        }
+        const data = await res.json();
+        setCars(data.cars);
+      } catch (err: any) {
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCars();
+  }, []);
 
   const carsForRender = cars
-    .filter((car) => carTypesFilter.length === 0 || carTypesFilter.includes(car.carBodyType as any))
-    .toSorted(sortHandlers[sort?.value || "price-high-to-low"]);
+    .filter(
+      (car) =>
+        carTypesFilter.length === 0 || carTypesFilter.includes(car.car_body_type as any)
+    )
+    .sort(sortHandlers[sort?.value || "price-high-to-low"]);
 
   const toggleCarType = (type: CarBodyType) => {
-    setCarTypesFilter(
-      (prev) => (prev.includes(type) ? [] : [type]), // Если тип уже выбран, сбрасываем фильтр, иначе выбираем новый тип
+    setCarTypesFilter((prev) =>
+      prev.includes(type) ? [] : [type] // Если тип уже выбран, сбрасываем фильтр, иначе выбираем новый тип
     );
   };
+
+  if (loading) {
+    return <div>Loading cars...</div>;
+  }
+
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
 
   return (
     <>
@@ -64,7 +98,7 @@ const CarCatalog = () => {
               key={carType.id}
               className={clsx(
                 carTypesFilter.includes(carType.name as any) && "bg-tertiary-gray",
-                "max-xl:scale-90 max-md:w-full max-md:h-full",
+                "max-xl:scale-90 max-md:w-full max-md:h-full"
               )}
             >
               <button
@@ -81,7 +115,7 @@ const CarCatalog = () => {
       <div className="flex items-center justify-between rounded-2xl bg-white p-4 max-[350px]:flex-col">
         <Select
           classNamePrefix="react-select"
-          placeholder="Pick-up location"
+          placeholder="Sort by price"
           options={sortOptions}
           theme={(theme) => ({
             ...theme,

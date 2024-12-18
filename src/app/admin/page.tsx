@@ -30,7 +30,7 @@ export default function Home() {
 
       // Редирект на основе роли
       if (role === "manager") {
-        router.push("/admin/manager/dashboard/cars"); // Страница для админа
+        router.push("/admin/manager/dashboard/contracts"); // Страница для админа
       } else if (role === "owner") {
         router.push("/admin/owner/dashboard/cars"); // Страница для владельца
       }

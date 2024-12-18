@@ -41,3 +41,4 @@ export async function DELETE(
     return NextResponse.json({ error: "Failed to delete review" }, { status: 500 });
   }
 }
+

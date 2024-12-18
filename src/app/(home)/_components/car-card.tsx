@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { FC, useCallback, useEffect, useState } from "react";
 import TransmissionIcon from "@/components/icons/transmission-icon";
-import { Car } from "@/typing/interfaces";
 import SeatIcon from "@/components/icons/seat-icon";
 import Image from "next/image";
 import EngineIcon from "@/components/icons/engine-icon";
@@ -15,6 +14,22 @@ import FuelIcon from "@/components/icons/fuel-icon";
 import clsx from "clsx";
 import SnowflakeIcon from "@/components/icons/snowflake";
 import { calculateDailyCost } from "@/hooks/useTotalPriceDay";
+
+export type Car = {
+    id: number;
+    brand: string;
+    model: string;
+    year: string;
+    car_body_type: string;
+    fuel_type: string;
+    price_per_day: number;
+    image_url: string; // Добавлено поле
+    engine_capacity?: string; // Поле, которое может быть необязательным
+    seats_quantity: number;
+    deposit: number;
+    transmission_type: string;
+  };
+
 
 const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
   const [isPremium, setIsPremium] = useState<boolean>(false);
@@ -34,9 +49,14 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
 
   useEffect(() => {
     // Ensure calculateDailyCost returns a number
-    const calculatedPrice = calculateDailyCost(startDate ? new Date(startDate) : new Date(), car.pricePerDay, false, isPremium);
+    const calculatedPrice = calculateDailyCost(
+      startDate ? new Date(startDate) : new Date(),
+      car.price_per_day,
+      false,
+      isPremium,
+    );
     setDayTotal(calculatedPrice);
-  }, [car.pricePerDay, startDate, isPremium]); // Depend on car.pricePerDay and startDate
+  }, [car.price_per_day, startDate, isPremium]); // Depend on car.pricePerDay and startDate
   return (
     <article>
       <div
@@ -46,34 +66,35 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
         )}
       >
         <div className="row-span-3 relative w-[400px] max-md:w-full max-md:h-[300px] max-xl:w-full max-[500px]:h-[200px]">
-          <Image src={car.imageUrl} alt={`${car.name} Image`} className="object-contain" sizes="100%, 100%" fill />
+          <Image src={car.image_url} alt={`${car.brand} ${car.model} Image`} className="object-contain" sizes="100%, 100%" fill />
         </div>
         <div className="flex flex-col items-start md:py-8">
           <div className="col-span-2 flex items-center justify-between max-md:mx-auto">
             <h3>
               <Link href={getCarBookingLink()}>
                 <span className="bg-base-bg-blue mr-4 rounded-sm px-2 py-1.5 text-sm">
-                  {car.carBodyType.toUpperCase()}
+                  {car.car_body_type ? car.car_body_type.toUpperCase() : "Unknown"}
                 </span>
-                <span className="text-lg font-semibold">{car.name}</span>
+
+                <span className="text-lg font-semibold">{car.brand} {car.model}</span>
               </Link>
             </h3>
           </div>
           <div className="mt-6 mb-4 grid grid-cols-2 gap-2 max-md:mx-auto">
             <span className="flex items-center gap-1">
-              <TransmissionIcon className="w-6 h-6" /> {car.transmissionType}
+              <TransmissionIcon className="w-6 h-6" /> {car.transmission_type}
             </span>
             <span className="flex items-center gap-1">
-              <FuelIcon className="w-6 h-6" /> {car.fuelType}
+              <FuelIcon className="w-6 h-6" /> {car.fuel_type}
             </span>
             <span className="flex items-center gap-1">
               <SnowflakeIcon className="w-6 h-6" /> Air Condition
             </span>
             <span className="flex items-center gap-1">
-              <SeatIcon className="w-6 h-6" /> {car.seatsQuantity} seats
+              <SeatIcon className="w-6 h-6" /> {car.seats_quantity} seats
             </span>
             <span className="flex items-center gap-1">
-              <EngineIcon className="w-6 h-6" /> {car.engineCapacity}
+              <EngineIcon className="w-6 h-6" /> {car.engine_capacity}
             </span>
             <span className="flex items-center gap-1">
               <CalendarIcon className="w-6 h-6" /> {car.year}
@@ -111,9 +132,9 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
             href={getCarBookingLink()}
             className="flex w-min items-center rounded-lg bg-brand-base px-4 py-2 text-white ml-auto"
             onClick={(e) => {
-                console.log("Link clicked!");
-                // Убедитесь, что preventDefault() не используется здесь
-              }}
+              console.log("Link clicked!");
+              // Убедитесь, что preventDefault() не используется здесь
+            }}
           >
             Book <span className="text-lg ml-2">{">"}</span>
           </Link>
@@ -160,8 +181,8 @@ const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {
             href={getCarBookingLink()}
             className="flex w-min items-center rounded-lg bg-brand-base px-4 py-2 text-white ml-auto"
             onClick={(e) => {
-                console.log("Generated link:", getCarBookingLink());
-              }}
+              console.log("Generated link:", getCarBookingLink());
+            }}
           >
             Book <span className="text-lg ml-2">{">"}</span>
           </Link>

@@ -1,10 +1,10 @@
 "use client";
 
+import { Car } from "@/app/(home)/_components/car-card";
 import { areas } from "@/app/(home)/_data/areas.data";
 import Loader from "@/components/icons/loader";
 import { useBookCar } from "@/hooks/useTelegram";
 import { useTotalPrice } from "@/hooks/useTotalPrice";
-import { Car } from "@/typing/interfaces";
 import clsx from "clsx";
 import dynamic from "next/dynamic";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -63,7 +63,7 @@ const BookCar: React.FC<BookCarProps> = ({ className, car }) => {
   const submitHandler = async ({ fullName, phone, comment }: Form) => {
     if (fullName && phone && phone.startsWith("+") && phone.length >= 9) {
       createBooking(
-        `Car Booking\n\n${car.name} ${car.year}\nPick-up Location: ${
+        `Car Booking\n\n${car.brand} ${car.model} ${car.year}\nPick-up Location: ${
           locationFrom ?? "Not mentioned"
         } + 250฿ \nDrop-off Location: ${
           locationTo ?? "Not mentioned"

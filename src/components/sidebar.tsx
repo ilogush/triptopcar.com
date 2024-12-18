@@ -88,7 +88,7 @@ export default function Sidebar() {
             {!collapsed && <span>{secondOwnerItem.label}</span>}
           </Link>
         )}
-        {menuItems.map((item) => (
+        {role !== null && menuItems.map((item) => (
           <Link
             key={item.href}
             href={`/admin/${role}${item.href}`}

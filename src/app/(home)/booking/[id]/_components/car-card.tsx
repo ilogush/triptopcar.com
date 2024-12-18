@@ -1,4 +1,4 @@
-import { Car } from "@/typing/interfaces";
+import { Car } from "@/app/(home)/_components/car-card";
 import clsx from "clsx";
 import Image from "next/image";
 import React from "react";
@@ -14,14 +14,14 @@ const CarCard: React.FC<CarCardProps> = ({ className, car }) => {
       <div>
         <header className="grid grid-cols-2 max-md:mx-auto gap-3">
           <h3 className="flex items-center">
-            <span className="bg-base-bg-blue mr-4 rounded-sm px-2 py-1.5 text-base">{car.carBodyType}</span>
-            <span className="text-lg font-semibold whitespace-nowrap">{car.name}</span>
+            <span className="bg-base-bg-blue mr-4 rounded-sm px-2 py-1.5 text-base">{car.car_body_type}</span>
+            <span className="text-lg font-semibold whitespace-nowrap">{car.brand} {car.model}</span>
           </h3>
         </header>
       </div>
       <main className="flex items-start w-full gap-12 max-md:flex-col max-md:items-center max-md:text-center">
         <div className="flex flex-col w-2/3 max-sm:w-full items-start max-md:items-center mt-8">
-          <Image src={car.imageUrl} alt={`${car.name} Image`} width={250} height={250} />
+          <Image src={car.image_url} alt={`${car.brand} ${car.model} Image`} width={250} height={250} />
         </div>
 
         <div className="flex flex-col items-start w-full max-sm:w-full -mt-0">

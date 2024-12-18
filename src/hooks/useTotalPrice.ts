@@ -1,6 +1,6 @@
+import { Car } from "@/app/(home)/_components/car-card";
 import { areas } from "@/app/(home)/_data/areas.data";
 import { calculateRentCost } from "@/lib/calculateRentCost";
-import { Car } from "@/typing/interfaces";
 
 export function useTotalPrice({
   isPremium,
@@ -21,7 +21,7 @@ export function useTotalPrice({
   pickupLocationId: number;
   dropoffLocationId: number;
 }) {
-  const dailyRate = car.pricePerDay; // Базовая стоимость за день
+  const dailyRate = car.price_per_day; // Базовая стоимость за день
   const deposit = car.deposit; // Возвратный депозит
 
   // Вычисляем стоимость аренды

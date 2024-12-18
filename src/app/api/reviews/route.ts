@@ -3,14 +3,20 @@ import { NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
-export async function GET() {
-  try {
-    const reviews = await prisma.reviews.findMany();
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const carId = searchParams.get('car_id'); // Получаем car_id из параметров запроса
+
+    if (!carId) {
+      return NextResponse.json({ error: "Car ID is required" }, { status: 400 });
+    }
+
+    const reviews = await prisma.reviews.findMany({
+      where: { car_id: parseInt(carId) }, // Фильтруем по car_id
+    });
+
     return NextResponse.json(reviews);
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to fetch reviews" }, { status: 500 });
   }
-}
 
 export async function POST(request: Request) {
   try {

@@ -2,7 +2,6 @@
 
 import { areas } from "@/app/(home)/_data/areas.data";
 import { useDropoffPrice, usePickupPrice, useTotalPrice } from "@/hooks/useTotalPrice";
-import { Car } from "@/typing/interfaces";
 import clsx from "clsx";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -11,6 +10,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import BookCar from "./bookCar";
 import { calculateDailyCost } from "@/hooks/useTotalPriceDay";
 import RentalIncludes from "@/app/(home)/booking/[id]/_components/RentalIncludes";
+import { Car } from "@/app/(home)/_components/car-card";
 
 interface BookingSidebarProps {
   className?: string;
@@ -78,12 +78,12 @@ const BookingSidebar: React.FC<BookingSidebarProps> = React.memo(({ className, c
     // Ensure calculateDailyCost returns a number
     const calculatedPrice = calculateDailyCost(
       startDate ? new Date(startDate) : new Date(),
-      car.pricePerDay,
+      car.price_per_day,
       false,
       isPremium,
     );
     setDayTotal(calculatedPrice);
-  }, [car.pricePerDay, startDate]); // Depend on car.pricePerDay and startDate
+  }, [car.price_per_day, startDate]); // Depend on car.pricePerDay and startDate
   return (
     <aside className={clsx("w-full h-full flex flex-col gap-6 sticky top-5", className)}>
       <div className="flex flex-col w-full bg-white rounded-lg p-[20px_10px_80px_10px] relative">

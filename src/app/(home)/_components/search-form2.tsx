@@ -14,7 +14,6 @@ import Select, { DropdownIndicatorProps } from "react-select";
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import { areas } from "../_data/areas.data";
-import SearchIcon from "@/components/icons/search-icon";
 
 const searchFormSchema = z.object({
   locationTo: z.number(),
@@ -96,11 +95,10 @@ const SearchForm2: FC = () => {
   const HourSelect = (props: any) => <Select {...props} components={{ DropdownIndicator }} />;
 
   return (
-    <section className="container mx-auto -mt-6 rounded-2xl bg-white px-4 py-2">
+    <section className="container mx-auto -mt-6 rounded-2xl bg-white p-4">
       <form onSubmit={form.handleSubmit(submitHandler)}>
         <div className="grid grid-cols-2 lg:grid-cols-12 md:grid-cols-2 gap-2">
           <div className="col-span-2 lg:col-span-2 sm:col-span-2">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Pick-up location</p>
             <Select
               className=" h-[50px]"
               classNamePrefix="react-select"
@@ -125,7 +123,6 @@ const SearchForm2: FC = () => {
             />
           </div>
           <div className="col-span-1 lg:col-span-2 sm:col-span-1">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Pick-up date</p>
             <Controller
               name="startDate"
               control={form.control}
@@ -145,7 +142,6 @@ const SearchForm2: FC = () => {
             />
           </div>
           <div className="col-span-1 lg:col-span-1 sm:col-span-1">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Time</p>
             <HourSelect
               aria-label="Start time"
               className="w-full h-[50px]"
@@ -160,7 +156,6 @@ const SearchForm2: FC = () => {
             />
           </div>
           <div className="col-span-2 lg:col-span-2 sm:col-span-2">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Drop-off location</p>
             <Select
               className="w-full h-[50px]"
               classNamePrefix="react-select"
@@ -185,7 +180,6 @@ const SearchForm2: FC = () => {
             />
           </div>
           <div className="col-span-1 lg:col-span-2 sm:col-span-1">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Drop-off date</p>
             <DatePicker
               className="w-full h-[50px]"
               clearIcon={null}
@@ -199,7 +193,6 @@ const SearchForm2: FC = () => {
             />
           </div>
           <div className="col-span-1 lg:col-span-1 sm:col-span-1">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">Time</p>
             <HourSelect
               aria-label="End time"
               className="w-full h-[50px]"
@@ -214,12 +207,8 @@ const SearchForm2: FC = () => {
             />
           </div>
           <div className="col-span-2 lg:col-span-2 sm:col-span-2">
-            <p className="text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">&nbsp;</p>
             <button type="submit" className="bg-brand-base text-white h-[50px] px-6 rounded-lg w-full">
-              <div className="flex justify-center gap-2">
-                <SearchIcon />
-                Search
-              </div>
+              Search
             </button>
           </div>
         </div>

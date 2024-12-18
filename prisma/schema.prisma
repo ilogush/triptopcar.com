@@ -1,0 +1,119 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ContractStatus {
+  PENDING       // Контракт создан, ожидается подтверждение
+  APPROVED      // Контракт одобрен
+  COMPLETED     // Контракт завершен
+  CANCELLED     // Контракт отменен
+}
+
+model cars {
+  id                Int         @id @default(autoincrement())
+  image_url         String      @db.VarChar(255)
+  car_body_type     String      @db.VarChar(50)
+  price_per_day     Int
+  engine_capacity   String?     @db.VarChar(10)
+  fuel_type         String      @db.VarChar(50)
+  seats_quantity    Int
+  deposit           Int
+  year              String      @db.VarChar(4)
+  transmission_type String      @db.VarChar(50)
+  brand             String      @db.VarChar(100)
+  model             String      @db.VarChar(100)
+  contracts         contracts[]
+  reviews           reviews[]
+}
+
+model clients {
+  id              Int         @id @default(autoincrement())
+  first_name      String      @db.VarChar(50)
+  last_name       String      @db.VarChar(50)
+  passport_number String?     @db.VarChar(20)
+  phone_1         String      @db.VarChar(20)
+  phone_2         String?     @db.VarChar(20)
+  status          String      @db.VarChar(10)
+  location_id     Int?
+  hotel_name      String?     @db.VarChar(100)
+  contracts       contracts[] @relation("ClientContracts")
+
+  @@map("clients")
+}
+
+model contracts {
+  id                        Int             @id @default(autoincrement())
+  car_id                    Int?
+  rental_amount             Decimal         @db.Decimal(10, 2)
+  rental_currency           String?         @default("USD") @db.VarChar(3)
+  deposit_currency          String          @db.VarChar(3)
+  pickup_location_id        Int?
+  address_return            String          @db.VarChar(255)
+  amount                    Decimal         @db.Decimal(10, 2)
+  client_name               String          @db.VarChar(100)
+  client_passport_number    String          @db.VarChar(50)
+  client_phone_number       String          @db.VarChar(20)
+  client_second_phone_number String?        @db.VarChar(20)
+  client_surname            String          @db.VarChar(100)
+  date_end                  DateTime
+  date_start                DateTime
+  dropoff_address           String          @db.VarChar(255)
+  dropoff_location_id       Int?
+  full_insurance            Boolean         @default(false)
+  location_return           String          @db.VarChar(255)
+  manager                   String          @db.VarChar(100)
+  mileage_odo               Int
+  pickup_address            String          @db.VarChar(255)
+  rental_deposit_amount     Decimal         @db.Decimal(10, 2)
+  rental_deposit_currency   String?         @default("USD") @db.VarChar(3)
+  time_return               DateTime?
+  status                    ContractStatus  @default(PENDING)
+  cars                      cars?           @relation(fields: [car_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  client                    clients         @relation("ClientContracts", fields: [client_id], references: [id], onDelete: Cascade)
+  client_id                 Int
+  payments                  payments[]      @relation("ContractPayments")
+
+  @@map("contracts")
+}
+
+model payments {
+  id           Int        @id @default(autoincrement())
+  contract_id  Int
+  payment_type String     @db.VarChar(50)
+  amount       Decimal    @db.Decimal(10, 2)
+  currency     String?    @default("USD") @db.VarChar(3)
+  created_at   DateTime?  @default(now()) @db.Timestamp(6)
+  contract     contracts  @relation("ContractPayments", fields: [contract_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("payments")
+}
+
+model reviews {
+  id         Int       @id @default(autoincrement())
+  car_id     Int
+  name       String    @db.VarChar(100)
+  review     String
+  rating     Int?
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+  cars       cars      @relation(fields: [car_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model admins {
+  id            Int       @id @default(autoincrement())
+  email         String    @unique @db.VarChar(255)
+  password_hash String    @db.VarChar(255)
+  role          String    @db.VarChar(50)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  updated_at    DateTime? @default(now()) @db.Timestamp(6)
+}
+
+model location {
+  id           Int    @id @default(autoincrement())
+  deliveryprice Int    // Доставка цена
+  name         String // Название
+}

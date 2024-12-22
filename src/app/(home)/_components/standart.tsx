@@ -27,16 +27,14 @@ const StandardConditions: FC<StandardConditionsProps> = ({ car, className, isPre
         }}
       >
         <input type="checkbox" className="w-5 h-5 mr-2" readOnly checked={!isPremium} />{" "}
-        Standard Conditions (included)
+        Стандартный пакет
       </h2>
       <ul className="list-disc text-slate-700 pl-5 font-medium mt-5 text-[15px]">
-        <li>Free cancel up to 24 hours</li>
-        <li>Hijack insurance</li>
-        <li>{formatPrice(car.deposit)} Franchise</li>
-        <li>Fuel Policy same as when pick-up</li>
-        <li>
-          Clean car when pick-up, and clean car when drop-off or pay for car wash
-        </li>
+        <li>Бесплатная отмена бронирования за 3 дня</li>
+        <li>Страхование от угона</li>
+        <li>{formatPrice(car.deposit)} страховая франшиза</li>
+        <li>Возвращайте автомобиль с тем же количеством топлива как при получении или оплачиваете разницу</li>
+        <li>Чистый автомобиль при получении и чистый автомобиль при возврате или оплата мойки автомобиля</li>
       </ul>
     </div>
   );

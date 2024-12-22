@@ -220,7 +220,7 @@ const SearchForm2: FC = () => {
       </form>
 
       <p className="mt-1 text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">
-        The minimum rental period is ${MIN_RENTAL_PERIOD} days.
+        Минимальный срок аренды ${MIN_RENTAL_PERIOD} суток.
       </p>
     </section>
   );

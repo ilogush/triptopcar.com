@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Logo from "@/components/icons/logo-icon";
 
 // const links: { name: string; path: string }[] = [
 //   { name: "Routes", path: "/routes" },
@@ -58,7 +57,7 @@ const Footer = () => {
                     </div>
                     <ul className="flex flex-col items-start gap-4 max-md:hidden">
                         <li className="text-2xl font-bold text-[#3291ff]">
-                            <Logo className="w-36" />
+                            TripTopCar
                         </li>
                     </ul>
                 </div>

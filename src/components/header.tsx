@@ -7,7 +7,6 @@ import TelegramIcon from "./icons/telegram-icon";
 import WhatsAppIcon from "./icons/whats-app-icon";
 import Link from "next/link";
 import Breadcrumbs from "./breadcrumbs";
-import Logo2 from "@/components/icons/logo2-icon";
 
 const links: { name: string; path: string }[] = [
   { name: "Routes", path: "/routes" },
@@ -27,7 +26,7 @@ const Header: FC = () => {
       <div className="container mx-auto flex items-end justify-between max-md:w-full">
         <div className="flex gap-10 items-end">
           <Link href="/" className="font-semibold text-white">
-            <Logo2 className="w-32" />
+            TripTopCar
           </Link>
           {breadCrumbsPaths.some((breadcrumb) => pathname.includes(breadcrumb)) ? (
             <Breadcrumbs pathname={pathname} className="max-lg:hidden" />

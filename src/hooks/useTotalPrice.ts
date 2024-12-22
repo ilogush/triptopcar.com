@@ -2,34 +2,25 @@ import { areas } from "@/app/(home)/_data/areas.data";
 import { calculateRentCost } from "@/lib/calculateRentCost";
 import { Car } from "@/typing/interfaces";
 
-export function useTotalPrice({
-  isPremium,
-  daysQuantity,
-  car,
-  startDate,
-  endDate,
-  includeChildSeat,
-  pickupLocationId,
-  dropoffLocationId,
-}: {
-  isPremium: boolean;
-  daysQuantity: number;
-  car: Car;
-  startDate: Date;
-  endDate: Date;
-  includeChildSeat: boolean;
-  pickupLocationId: number;
-  dropoffLocationId: number;
-}) {
-  const dailyRate = car.pricePerDay; // Базовая стоимость за день
-  //const deposit = car.deposit; // Возвратный депозит
-
+export function useTotalPrice(
+  {
+    isPremium,
+    car,
+    startDate,
+    endDate,
+    pickupLocationId,
+    dropoffLocationId,
+  }: {
+    isPremium: boolean;
+    car: Car;
+    startDate: Date;
+    endDate: Date;
+    pickupLocationId: number;
+    dropoffLocationId: number;
+  },
+) {
   // Вычисляем стоимость аренды
-  const baseRentalFee = calculateRentCost(startDate, endDate, dailyRate, includeChildSeat);
-
-  // Премиальная страховка (опционально)
-  const premiumPrice = car.premiumExtraPrice ?? 400;
-  const insuranceFee = isPremium ? premiumPrice * daysQuantity : 0;
+  const baseRentalFee = calculateRentCost(car, startDate, endDate, isPremium);
 
   // Стоимость доставки за пункты выдачи и возврата
   const pickupLocation = areas.find((area) => area.id === pickupLocationId);
@@ -37,11 +28,7 @@ export function useTotalPrice({
   const deliveryFee = (pickupLocation?.deliveryPrice || 0) + (dropoffLocation?.deliveryPrice || 0);
 
   // Итоговая стоимость
-  const totalPrice = baseRentalFee + insuranceFee + deliveryFee;
-
-  // Логирование для отладки
-  // console.log("Вызов useTotalPrice", { isPremium, daysQuantity, car, startDate, endDate, includeChildSeat, pickupLocation, dropoffLocation });
-  // console.log("totalPrice", Math.round(totalPrice));
+  const totalPrice = baseRentalFee + deliveryFee;
 
   return Math.round(totalPrice);
 }

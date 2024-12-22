@@ -1,20 +1,21 @@
 "use client";
 
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import DatePicker from "react-date-picker";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import dynamic from "next/dynamic";
-import { useSearchParams } from "next/navigation";
 import CalendarIcon from "@/components/icons/calendar-days-icon";
 import Calendar11Icon from "@/components/icons/calendar-days11-icon";
 import Select, { DropdownIndicatorProps } from "react-select";
-
 import "react-date-picker/dist/DatePicker.css";
 import "react-calendar/dist/Calendar.css";
 import { areas } from "../_data/areas.data";
 import SearchIcon from "@/components/icons/search-icon";
+import { formatDateToYMD, useCriteriaParams } from "@/lib/price";
+import { addDays } from "date-fns";
+import { MIN_RENTAL_PERIOD } from "@/lib/config";
 
 const searchFormSchema = z.object({
   locationTo: z.number(),
@@ -26,50 +27,43 @@ const searchFormSchema = z.object({
 });
 
 const SearchForm2: FC = () => {
-  const searchParams = useSearchParams();
+  const [delayedLoading, setDelayedLoading] = useState(false);
+
+  const criteria = useCriteriaParams();
+
   const form = useForm<z.infer<typeof searchFormSchema>>({
     resolver: zodResolver(searchFormSchema),
     defaultValues: {
       locationTo: 1,
       locationFrom: 1,
-      startDate: new Date(),
-      endDate: searchParams.get("endDate")
-        ? new Date(Number(searchParams.get("endDate")))
-        : new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
-      startTime: "10:00",
-      endTime: "10:00",
+      startDate: criteria.startDate,
+      endDate: criteria.endDate,
+      startTime: criteria.startTime,
+      endTime: criteria.endTime,
     },
   });
 
   useEffect(() => {
-    form.reset({
-      locationTo: Number(searchParams.get("locationTo")) || 1,
-      locationFrom: Number(searchParams.get("locationFrom")) || 1,
-      startDate: searchParams.get("startDate") ? new Date(Number(searchParams.get("startDate"))) : new Date(),
-      endDate: searchParams.get("endDate")
-        ? new Date(Number(searchParams.get("endDate")))
-        : new Date(new Date().getTime() + 3 * 24 * 60 * 60 * 1000),
-      startTime: searchParams.get("startTime") || "10:00", // Reset start time
-      endTime: searchParams.get("endTime") || "10:00", // Reset end time
-    });
-  }, [searchParams, form]);
-
-  useEffect(() => {
     const currentEndDate = form.getValues("endDate");
-    const newEndDate = new Date(form.watch("startDate").getTime() + 3 * 24 * 60 * 60 * 1000);
+    const newEndDate = addDays(form.watch("startDate"), MIN_RENTAL_PERIOD);
+
     if (currentEndDate < newEndDate) {
       form.setValue("endDate", newEndDate);
     }
   }, [form.watch("startDate")]);
 
   const submitHandler = async (values: z.infer<typeof searchFormSchema>) => {
+    setDelayedLoading(true);
+    setTimeout(() => setDelayedLoading(false), 500);
+
     const url = new URL(window.location.href);
     url.searchParams.set("locationTo", String(values.locationTo));
     url.searchParams.set("locationFrom", String(values.locationFrom));
-    url.searchParams.set("startDate", String(values.startDate.getTime()));
-    url.searchParams.set("endDate", String(values.endDate.getTime()));
+    url.searchParams.set("startDate", formatDateToYMD(values.startDate));
+    url.searchParams.set("endDate", formatDateToYMD(values.endDate));
     url.searchParams.set("startTime", values.startTime); // Set start time in URL
     url.searchParams.set("endTime", values.endTime); // Set end time in URL
+
     window.history.pushState({}, "", url.toString());
   };
 
@@ -191,7 +185,7 @@ const SearchForm2: FC = () => {
               clearIcon={null}
               calendarIcon={<Calendar11Icon />}
               calendarProps={{
-                minDate: new Date((form.watch("startDate") ?? new Date()).getTime() + 3 * 24 * 60 * 60 * 1000),
+                minDate: new Date((form.watch("startDate") ?? new Date()).getTime() + MIN_RENTAL_PERIOD * 24 * 60 * 60 * 1000),
                 maxDate: new Date((form.watch("startDate") ?? new Date()).getTime() + 61 * 24 * 60 * 60 * 1000),
               }}
               onChange={(date) => form.setValue("endDate", date as Date)}
@@ -218,7 +212,7 @@ const SearchForm2: FC = () => {
             <button type="submit" className="bg-brand-base text-white h-[50px] px-6 rounded-lg w-full">
               <div className="flex justify-center gap-2">
                 <SearchIcon />
-                Search
+                {delayedLoading ? "Loading..." : "Search"}
               </div>
             </button>
           </div>
@@ -226,7 +220,7 @@ const SearchForm2: FC = () => {
       </form>
 
       <p className="mt-1 text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">
-        The minimum rental period is 3 days.
+        The minimum rental period is ${MIN_RENTAL_PERIOD} days.
       </p>
     </section>
   );

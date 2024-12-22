@@ -20,9 +20,7 @@ export default async function HomePage() {
             />
             <div className="relative w-full h-full p-4 flex flex-col items-end">
               <div className="h-full w-full text-left pb-2">
-                Medical insurance to Thailand and 21 other countries with
-                insurance coverage of USD 100,000 for only USD 300 per year.
-                Your reliable protection against accidents and illnesses abroad
+                Medical insurance for living in Thailand and 21 other countries of the world including the EU zone with insurance coverage up to 50,000 US dollars for only 420 US dollars per year. The policy covers damage in the event of natural disasters and all kinds of epidemics. This is your reliable protection against accidents and illnesses abroad.
               </div>
               <button className="bg-brand-base text-white rounded-md">
                 <Link

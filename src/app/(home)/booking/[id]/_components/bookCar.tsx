@@ -1,16 +1,15 @@
 "use client";
 
-import { areas } from "@/app/(home)/_data/areas.data";
 import Loader from "@/components/icons/loader";
 import { useBookCar } from "@/hooks/useTelegram";
-import { useTotalPrice } from "@/hooks/useTotalPrice";
 import { Car } from "@/typing/interfaces";
 import clsx from "clsx";
 import dynamic from "next/dynamic";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { FC, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { formatDateToYMD, useCriteriaParams } from "@/lib/price";
 
 interface BookCarProps {
   className?: string;
@@ -25,33 +24,23 @@ interface Form {
   dropoffLocation: string;
 }
 
-const BookCar: React.FC<BookCarProps> = ({ className, car }) => {
-  const searchParams = useSearchParams();
-  const timeStart = searchParams.get("timeStart") ?? "10:00";
-  const timeEnd = searchParams.get("timeEnd") ?? "10:00";
-  const locationFrom = areas.find(
-    (area) => area.id === (Number(searchParams.get("locationFrom")) !== 0 ? Number(searchParams.get("locationFrom")) : 1),)?.name;
-  const locationTo = areas.find(
-    (area) => area.id === (Number(searchParams.get("locationTo")) !== 0 ? Number(searchParams.get("locationTo")) : 1),
-  )?.name;
-  const startDate =
-    Number(searchParams.get("startDate")) !== 0 ? Number(searchParams.get("startDate")) : new Date().getTime();
-  const endDate =
-    Number(searchParams.get("endDate")) !== 0
-      ? Number(searchParams.get("endDate"))
-      : new Date().getTime() + 3 * 24 * 60 * 60 * 1000;
-  const daysQuantity = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
-  const isPremium = searchParams.get("isPremium") === "true";
-  const totalPrice = useTotalPrice({
-    car,
-    daysQuantity,
-    isPremium,
-    startDate: new Date(startDate),
-    endDate: new Date(endDate),
-    includeChildSeat: false,
-    pickupLocationId: Number(searchParams.get("locationFrom")) || 1, // ID пункта выдачи
-    dropoffLocationId: Number(searchParams.get("locationTo")) || 1, // ID пункта возврата
-  });
+const BookCar: FC<BookCarProps> = ({ className, car }) => {
+  const criteria = useCriteriaParams();
+
+  const startDate = criteria.startDate;
+  const endDate = criteria.endDate;
+
+  const locationFromId = criteria.locationFromId;
+  const locationToId = criteria.locationToId;
+
+  const startTime = criteria.startTime;
+  const endTime = criteria.endTime;
+
+  const isPremium = criteria.isPremium;
+
+  const totalPrice = criteria.totalPriceByCar(car);
+  const pickupPrice = criteria.pickupPrice();
+  const dropoffPrice = criteria.dropoffPrice();
 
   const { push } = useRouter();
 
@@ -63,20 +52,22 @@ const BookCar: React.FC<BookCarProps> = ({ className, car }) => {
   const submitHandler = async ({ fullName, phone, comment }: Form) => {
     if (fullName && phone && phone.startsWith("+") && phone.length >= 9) {
       createBooking(
-        `Car Booking\n\n${car.name} ${car.year}\nPick-up Location: ${
-          locationFrom ?? "Not mentioned"
-        } + 250฿ \nDrop-off Location: ${
-          locationTo ?? "Not mentioned"
-        } + 250฿\nStart: ${new Date(startDate).toLocaleDateString()} ${
-          timeStart
-        }\nFinish: ${new Date(endDate).toLocaleDateString()} ${
-          timeEnd
-        }\nTotal: ${totalPrice} ฿\nDeposit: ${car.deposit} ฿\nInsurance: ${
-          isPremium ? "Full" : "Standart"
-        }\n${fullName} ${phone}\n${comment}\n`,
+        `Car Booking
+${car.name} ${car.year}
+Pick-up Location: ${criteria.locationFromName ?? "Not mentioned"} + ${pickupPrice}฿
+Drop-off Location: ${criteria.locationToName ?? "Not mentioned"} + ${dropoffPrice}฿
+Start: ${formatDateToYMD(startDate)}: ${startTime}
+Finish: ${formatDateToYMD(endDate)}: ${endTime}
+Total: ${totalPrice} ฿\nDeposit: ${car.deposit} ฿
+Insurance: ${isPremium ? "Full" : "Standard"}
+${fullName} ${phone}
+${comment}
+`,
       );
+
+      // Why?
       push(
-        `/checkout?carId=${car.id}&isPremium=${isPremium}&startDate=${startDate}&endDate=${endDate}&timeStart=${timeStart}&timeEnd=${timeEnd}&dropoffLocation=${locationTo}&pickupLocation=${locationFrom}&fullName=${fullName}&phone=${phone}`,
+        `/checkout?carId=${car.id}&isPremium=${isPremium}&startDate=${formatDateToYMD(startDate)}&endDate=${formatDateToYMD(endDate)}&timeStart=${startTime}&timeEnd=${endTime}&dropoffLocation=${locationToId}&pickupLocation=${locationFromId}&fullName=${fullName}&phone=${phone}`,
       );
     } else {
       toast.error("Please fill all the fields correctly.");

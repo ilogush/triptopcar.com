@@ -1,6 +1,8 @@
 "use client";
+
 import dynamic from "next/dynamic";
-import { useSearchParams } from "next/navigation";
+import { Car } from "@/typing/interfaces";
+import { formatPrice, useCriteriaParams } from "@/lib/price";
 
 const Header = ({ label }: { label: string }) => {
   if (!label) {
@@ -9,26 +11,21 @@ const Header = ({ label }: { label: string }) => {
 
   return <h4 className="text-xl font-bold text-slate-700">Rental includes</h4>;
 };
-const RentalIncludes = ({ label = "Rental includes" }: { label: string }) => {
-  const params = useSearchParams();
 
-  const premium = params.get("isPremium") === "true"; // Проверяем строку 'true'
+const RentalIncludes = ({ car, label = "Rental includes" }: { car: Car, label: string }) => {
+  const criteria = useCriteriaParams();
+
+  const isPremium = criteria.isPremium;
 
   return (
     <div className="flex flex-col items-start w-full max-sm:w-full -mt-7">
       <Header label={label} />
 
-      {!premium ? (
+      {!isPremium ? (
         <ul className="list-disc text-slate-700 pl-5 font-medium mt-5 text-[16px] text-left">
           <li>Free cancel up to 24 hours</li>
           <li>Hijack insurance</li>
-          <li>
-            {Intl.NumberFormat("th-TH", {
-              style: "currency",
-              currency: "THB",
-            }).format(5000)}{" "}
-            Franchise
-          </li>
+          <li>{formatPrice(car.deposit)} Franchise</li>
           <li>Fuel Policy same as when pick-up</li>
           <li>Clean car when pick-up, and clean car when drop-off or pay for car wash</li>
         </ul>

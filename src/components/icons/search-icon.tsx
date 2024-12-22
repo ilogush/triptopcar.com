@@ -7,7 +7,7 @@ interface CheckIconProps {
 const SearchIcon: React.FC<CheckIconProps> = ({ className }) => {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="10" cy="10" r="7" stroke="black" strokeWidth="2" />
+      <circle cx="10" cy="10" r="7" stroke="white" strokeWidth="2" />
       <rect
         x="14.4645"
         y="15.1716"
@@ -15,7 +15,7 @@ const SearchIcon: React.FC<CheckIconProps> = ({ className }) => {
         height="9"
         rx="0.5"
         transform="rotate(-45 14.4645 15.1716)"
-        stroke="black"
+        stroke="white"
       />
     </svg>
   );

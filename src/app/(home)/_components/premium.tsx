@@ -27,21 +27,22 @@ const PremiumConditions: React.FC<PremiumConditionsProps> = ({ car, className, i
           }}
       >
         <input type="checkbox" className="w-5 h-5 mr-2" readOnly checked={isSelected} />{" "}
-        Premium Conditions
+        Премиальный пакет
         <span className="text-base-black-secondary gap-2 font-normal text-sm ml-3">
-            {formatPrice(premiumPrice)} per day
+            {formatPrice(premiumPrice)} в сутки
         </span>
       </h2>
       <ul className="list-disc text-slate-700 text-[15px] pl-5 font-medium mt-5">
-        <li>Free cancel up to 48 hours</li>
-        <li>Full Insurance</li>
-        <li>Hijack insurance</li>
-        <li>Civil liability insurance</li>
-        <li>Crash insurance</li>
-        <li>No Insurance franchise</li>
-        <li>Second driver free</li>
-        <li>Mileage without restrictions</li>
-        <li>24/7 online support</li>
+        <li>Беспоатная отмена бронирования за 2 дня</li>
+        <li>Полная страховка</li>
+        <li>Страхование от угона</li>
+        <li>Страхование гражданской ответственности</li>
+        <li>Страхование от несчастных случаев</li>
+        <li>Нет страховой франшизы</li>
+        <li>Неограниченное количество водителей</li>
+        <li>Пробег без ограниченийs</li>
+        <li>Круглосуточная онлайн-поддержка</li>
+        <li>Бесплатная помощь на дороге</li>
       </ul>
     </div>
   );

@@ -49,7 +49,7 @@ const CarCard: FC<CarCardProps> = ({ car, className }) => {
       <>
         <article>
           <p className="mt-1 text-[0.675rem] sm:text-[0.775rem] leading-[1.25rem] text-gray-500">
-            The minimum rental period is ${MIN_RENTAL_PERIOD} days.
+            Минимальный период аренды ${MIN_RENTAL_PERIOD} дня.
           </p>
         </article>
       </>

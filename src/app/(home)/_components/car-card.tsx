@@ -26,6 +26,7 @@ const CarCard: FC<CarCardProps> = ({ car, className }) => {
   const [isPremium, setIsPremium] = useState<boolean>(false);
 
   const criteria = useCriteriaParams();
+  criteria.isPremium = isPremium;
 
   const startDate = criteria.startDate;
   const endDate = criteria.endDate;
@@ -120,7 +121,7 @@ const CarCard: FC<CarCardProps> = ({ car, className }) => {
               // Убедитесь, что preventDefault() не используется здесь
             }}
           >
-            Book <span className="text-lg ml-2">{">"}</span>
+            Book <span className="text-lg ml-2">&gt;</span>
           </Link>
         </div>
       </div>
@@ -161,7 +162,7 @@ const CarCard: FC<CarCardProps> = ({ car, className }) => {
               console.log("Generated link:", getCarBookingLink);
             }}
           >
-            Book <span className="text-lg ml-2">{">"}</span>
+            Book <span className="text-lg ml-2">&gt;</span>
           </Link>
         </div>
       </div>

@@ -140,15 +140,9 @@ export function calculateChildSeatPrice(startDateTime: Date, endDateTime: Date):
   return getDurationChildSeatPricePerDay(days) * days;
 }
 
-export function calculateRentCost(
-  car: Car,
-  startDate: Date,
-  endDate: Date,
-  isPremium: boolean = false,
-): number {
-
+export function calculateRentCost(car: Car, startDate: Date, endDate: Date, isPremium: boolean = false): number {
   const dailyRate = car.pricePerDay; // Базовая стоимость за день
-  const premiumDailyRate = car.premiumExtraPrice ?? 0; // Базовая стоимость за день
+  const premiumDailyRate = car.premiumExtraPrice ?? 400;
 
   // Проверяем, есть ли сезон для даты начала
   if (
@@ -177,12 +171,16 @@ export function calculateRentCost(
     //console.log(`Дата: ${currentDate.toLocaleDateString()} - Коэффициент: ${coefficient}`);
 
     totalCost += dailyRate * coefficient;
+
+    if (isPremium) {
+      totalCost += premiumDailyRate;
+    }
   }
 
   const durationCoefficient = getDurationCoefficient(getDaysDiff(endDate, startDate));
   //console.log(`Коэффициент продолжительности: ${durationCoefficient}`);
 
-  totalCost = roundUpToHundredThousand(totalCost * durationCoefficient);
+  totalCost = totalCost * durationCoefficient;
 
   // if (false) {
   //   const childSeatCost = calculateChildSeatPrice(startDate, endDate);
@@ -190,11 +188,6 @@ export function calculateRentCost(
   //
   //   totalCost += childSeatCost;
   // }
-
-  if (isPremium) {
-    const premiumPrice = premiumDailyRate ?? 400;
-    totalCost = totalCost + premiumPrice;
-  }
 
   return totalCost;
 }

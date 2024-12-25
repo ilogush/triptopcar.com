@@ -155,15 +155,29 @@ export const cars: Car[] = [
     seatsQuantity: 5,
     transmissionType: "Automatic",
     reviews: [
-      {
+            {
         id: 1,
+        name: "William",
+        review:
+          "This wonderful little crossover car turned out to be a very economical assistant on our trip. During the valuable month, it took us to the most remote corners of Thailand. We were very pleased with our decision to rent a Toyota Yaris Atif. I recommend choosing it!",
+        rating: 5,
+      },
+      {
+        id: 2,
+        name: "Johnson",
+        review:
+          "Compact Micros er is a great optionFor its money. Thanks to hybrid technology, this car consumed less than 5 liters per 100 km. We really liked it. Next time we will choose a car.",
+        rating: 5,
+      },
+      {
+        id: 3,
         name: "Donald B.",
         review:
           "We rented the most affordable car available for our dates Toyota Yaris Ativ. Its was good car, the only thing on the mountain trails was the lack of a 1.2 liter engine.",
         rating: 4,
       },
       {
-        id: 2,
+        id: 4,
         name: "Emely Hernandez",
         review:
           "We were thrilled with the Toyota Yaris Ativ! It's spacious, perfect for family trips around Phuket. It glides smoothly over bumpy roads, and we enjoyed traveling comfortably on both beaches and mountain roads. I definitely recommend it for rental.",
@@ -229,31 +243,15 @@ export const cars: Car[] = [
           "Renting a Toyota Vios in Phuket was a fantastic decision. The car was reliable, comfortable, and perfect for exploring the island. The rental process was smooth and easy, and the staff were very friendly.",
         rating: 5,
       },
-    ],
-  },
-  {
-    id: 8,
-    imageUrl: "/mazda_2.png",
-    name: "Mazda 2",
-    carBodyType: "Sedan",
-    pricePerDay: 650,
-    premiumExtraPrice: 450,
-    engineCapacity: "1.2",
-    year: "2023",
-    fuelType: "Gasoline A95",
-    deposit: 7000,
-    seatsQuantity: 4,
-    transmissionType: "Automatic",
-    reviews: [
       {
-        id: 1,
+        id: 3,
         name: "Michael",
         review:
           "I booked Mazda 2 four months in advance through the website, To get an additional discount on pre-booking. I received the car at Phuket airportIn accordance withAbuseThe same class and model, Color. I can't imagineHolidays in Phuket without a car anymore. Now I will alwaysRent a car, it's very convenient and you can visitSave money on taxis many different places and attractions in Thailand. I recommend everyone to rent cars, it's very convenient and fastFor little money.",
         rating: 5,
       },
       {
-        id: 2,
+        id: 4,
         name: "James",
         review:
           "I rented a car for two weeks upon arrival right at the Phuket airport. I returned it there to a friendly employee of the company. The only thing I didn't see in the rental conditions was a payment for a car wash of 400 baht at the end of the rental period, since the car was quite dirty after two weeks of use. Otherwise, everything went smoothly and quite easily. Next time I will contact the same company.",
@@ -262,38 +260,7 @@ export const cars: Car[] = [
     ],
   },
   {
-    id: 9,
-    imageUrl: "/toyota_yaris_cross.png",
-    name: "Toyota Yaris Cross",
-    carBodyType: "SUV",
-    pricePerDay: 1100,
-    premiumExtraPrice: 700,
-    engineCapacity: "1.5 Hybrid",
-    year: "2024",
-    fuelType: "Gasoline A95",
-    deposit: 10000,
-    seatsQuantity: 5,
-    transmissionType: "Automatic",
-    reviews: [
-      {
-        id: 1,
-        name: "William",
-        review:
-          "This wonderful little crossover car turned out to be a very economical assistant on our trip. During the valuable month, it took us to the most remote corners of Thailand. We were very pleased with our decision to rent a Toyota Yaris Atif. I recommend choosing it!",
-        rating: 5,
-      },
-      {
-        id: 2,
-        name: "Johnson",
-        review:
-          "Compact Micros er is a great optionFor its money. Thanks to hybrid technology, this car consumed less than 5 liters per 100 km. We really liked it. Next time we will choose a car.",
-        rating: 5,
-      },
-    ],
-  },
-
-  {
-    id: 10,
+    id: 8,
     imageUrl: "/chevrolet_captiva.png",
     name: "Chevrolet Captiva",
     carBodyType: "SUV",
@@ -323,7 +290,7 @@ export const cars: Car[] = [
     ],
   },
   {
-    id: 11,
+    id: 9,
     imageUrl: "/mazda_cx30.png",
     name: "Mazda CX30",
     carBodyType: "SUV",
@@ -353,7 +320,7 @@ export const cars: Car[] = [
     ],
   },
   {
-    id: 12,
+    id: 10,
     imageUrl: "/toyota_fortuner.png",
     name: "Toyota Fortuner",
     carBodyType: "SUV",
@@ -383,7 +350,7 @@ export const cars: Car[] = [
     ],
   },
   {
-    id: 13,
+    id: 11,
     imageUrl: "/bmw_530e.png",
     name: "BMW 530E",
     carBodyType: "Sedan",
@@ -413,7 +380,7 @@ export const cars: Car[] = [
     ],
   },
   {
-    id: 14,
+    id: 12,
     imageUrl: "/bmw_x5.png",
     name: "BMW X5",
     carBodyType: "SUV",
@@ -443,7 +410,7 @@ export const cars: Car[] = [
     ],
   },
   {
-    id: 17,
+    id: 13,
     imageUrl: "/ford_ranger.png",
     name: "Ford Ranger",
     carBodyType: "Pickup",
@@ -470,31 +437,15 @@ export const cars: Car[] = [
           "We had to rent a Toyota Fortuner and for the locationVilla on a steep hill.Some taxis in the daughterCould not afford to go up our steep hill and bring us to what was quite uncomfortable.Toyota Fortuner coped with this task perfectly and we are grateful to the service for its prompt work and delivery of the car despite the late hour. Thank you very much!",
         rating: 5,
       },
-    ],
-  },
-  {
-    id: 15,
-    imageUrl: "/toyota_hilux.png",
-    name: "Toyota Hilux",
-    carBodyType: "Pickup",
-    pricePerDay: 1100,
-    premiumExtraPrice: 550,
-    engineCapacity: "2.8 Turbo",
-    fuelType: "Diesel",
-    seatsQuantity: 4,
-    deposit: 10000,
-    year: "2024",
-    transmissionType: "Automatic",
-    reviews: [
       {
-        id: 1,
+        id: 3,
         name: "David Sarokovich",
         review:
           "Toyota Fortuner is the most powerful car from diesel SUVs in this company. There was a large company of us and we did not even consider other rental options, since we visit Thailand every year and already had experience renting other models of cars. I recommend everyone who wants a powerful car to choose and specifically Toyota Fortuner.",
         rating: 5,
       },
       {
-        id: 2,
+        id: 4,
         name: "Robert V.",
         review:
           "We had to rent a Toyota Fortuner and for the locationVilla on a steep hill.Some taxis in the daughterCould not afford to go up our steep hill and bring us to what was quite uncomfortable.Toyota Fortuner coped with this task perfectly and we are grateful to the service for its prompt work and delivery of the car despite the late hour. Thank you very much!",
@@ -503,7 +454,7 @@ export const cars: Car[] = [
     ],
   },
   {
-    id: 16,
+    id: 14,
     imageUrl: "/toyota_majesty.png",
     name: "Toyota Majesty",
     carBodyType: "Van",

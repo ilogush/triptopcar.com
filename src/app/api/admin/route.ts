@@ -6,30 +6,35 @@ import { NextRequest, NextResponse } from "next/server";
 const SECRET_KEY = "your-secret-key"; // Замените на безопасный ключ
 const prisma = new PrismaClient();
 
+// fetch('/admin/owner') POST
 export const POST = async (req: NextRequest) => {
-  // Проверка на метод POST
   if (req.method !== "POST") {
     return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
   }
 
-  const { email, password, role } = await req.json(); // Используем req.json() для извлечения данных
-  console.log(req.body);
-
   try {
-    // Находим пользователя по email
+    const { name, password, role } = await req.json();
+    console.log("Received data:", { name, password, role }); // Логируем входящие данные
+
+    // Проверяем, что все данные переданы
+    if (!name || !password || !role) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+    }
+
+    // Находим пользователя по имени
     const user = await prisma.admins.findUnique({
-      where: { email },
+      where: { name },
     });
-    console.log(user);
+    console.log("User found:", user); // Логируем найденного пользователя
 
     if (!user) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid name or password" }, { status: 401 });
     }
 
     // Проверяем пароль
     const isPasswordValid = await bcrypt.compare(password, user.password_hash);
     if (!isPasswordValid) {
-      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid name or password" }, { status: 401 });
     }
 
     // Проверяем роль
@@ -37,18 +42,17 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
     }
 
-    // Проверяем, что все поля определены
-    if (!user.id || !user.email || !user.role) {
-      console.error("User object is missing required fields:", user);
+    // Проверяем, что все данные в объекте пользователя корректны
+    if (!user.id || !user.name || !user.role) {
       return NextResponse.json({ error: "User data is incomplete" }, { status: 500 });
     }
 
-    // Создаем токен
-    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, SECRET_KEY, { expiresIn: "1h" });
+    // Создаем токен, если все данные валидны
+    const token = jwt.sign({ id: user.id, name: user.name, role: user.role }, SECRET_KEY, { expiresIn: "1h" });
 
-    return NextResponse.json({ token }); // Возвращаем токен в ответе
+    return NextResponse.json({ token });
   } catch (err) {
-    console.log(err);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Error processing request:", err);
+    return NextResponse.json({ error: "Internal server error", details: err || err }, { status: 500 });
   }
 };

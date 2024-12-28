@@ -15,9 +15,8 @@ export interface Review {
   created_at: string;
 }
 
-// Обновляем интерфейс для пропсов компонента
 interface BookingIdProps {
-  params: Promise<{ id: string }>; // Параметры передаются как Promise
+  params: Promise<{ id: string }>;
 }
 
 export default function BookingId({ params }: BookingIdProps) {
@@ -29,7 +28,6 @@ export default function BookingId({ params }: BookingIdProps) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Распаковываем params
     params
       .then((resolvedParams) => {
         setId(resolvedParams.id);
@@ -42,12 +40,12 @@ export default function BookingId({ params }: BookingIdProps) {
   useEffect(() => {
     if (!id) return;
 
-    const idNum = Number(id); // Преобразуем ID в число
+    const idNum = Number(id);
     if (isNaN(idNum)) {
       setError("Invalid car ID");
       return;
     }
-    setIdNumber(idNum); // Устанавливаем состояние для idNumber
+    setIdNumber(idNum);
   }, [id]);
 
   useEffect(() => {
@@ -60,6 +58,10 @@ export default function BookingId({ params }: BookingIdProps) {
         if (!carRes.ok) throw new Error("Failed to fetch car");
 
         const carData = await carRes.json();
+        if (!carData.is_available) {
+          notFound(); // Если автомобиль недоступен, перенаправляем на страницу 404
+          return;
+        }
         setCar(carData);
 
         const reviewsRes = await fetch(`/api/reviews?car_id=${idNumber}`);

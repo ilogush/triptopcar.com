@@ -14,6 +14,11 @@ enum ContractStatus {
   CANCELLED     // Контракт отменен
 }
 
+enum PaymentStatus {
+  ACCEPTED
+  NOT_ACCEPTED
+}
+
 model cars {
   id                Int         @id @default(autoincrement())
   image_url         String      @db.VarChar(255)
@@ -27,9 +32,15 @@ model cars {
   transmission_type String      @db.VarChar(50)
   brand             String      @db.VarChar(100)
   model             String      @db.VarChar(100)
+  car_number        String      @default("") // Значение по умолчанию
+  color             String      @db.VarChar(20)  // Цвет машины
+  oil_last_change   DateTime?   // Дата последней замены масла
+  ode               Int?        // Пробег
+  is_available      Boolean     @default(true) // Наличие машины
   contracts         contracts[]
   reviews           reviews[]
 }
+
 
 model clients {
   id              Int         @id @default(autoincrement())
@@ -53,8 +64,6 @@ model contracts {
   rental_currency           String?         @default("USD") @db.VarChar(3)
   deposit_currency          String          @db.VarChar(3)
   pickup_location_id        Int?
-  address_return            String          @db.VarChar(255)
-  amount                    Decimal         @db.Decimal(10, 2)
   client_name               String          @db.VarChar(100)
   client_passport_number    String          @db.VarChar(50)
   client_phone_number       String          @db.VarChar(20)
@@ -65,7 +74,6 @@ model contracts {
   dropoff_address           String          @db.VarChar(255)
   dropoff_location_id       Int?
   full_insurance            Boolean         @default(false)
-  location_return           String          @db.VarChar(255)
   manager                   String          @db.VarChar(100)
   mileage_odo               Int
   pickup_address            String          @db.VarChar(255)
@@ -86,12 +94,23 @@ model payments {
   contract_id  Int
   payment_type String     @db.VarChar(50)
   amount       Decimal    @db.Decimal(10, 2)
-  currency     String?    @default("USD") @db.VarChar(3)
+  currency     String?    @default("THB") @db.VarChar(3)
   created_at   DateTime?  @default(now()) @db.Timestamp(6)
   contract     contracts  @relation("ContractPayments", fields: [contract_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@map("payments")
+  car_number   String?    @db.VarChar(20)  // Номер машины
+  manager_id   Int?       // ID менеджера (необязательное поле)
+  manager      admins?    @relation("ManagerPayments", fields: [manager_id], references: [id], onDelete: Cascade, onUpdate: NoAction) // This field now refers to "ManagerPayments"
+  payment_sign Boolean    @default(true) // расход доход
+  status       PaymentStatus @default(NOT_ACCEPTED)
 }
+
+model reports {
+  id           Int      @id @default(autoincrement())
+  manager_id   Int
+  total_amount Decimal  @db.Decimal(10, 2)  // Сумма платежей по менеджеру
+  manager      admins  @relation(fields: [manager_id], references: [id])
+}
+
 
 model reviews {
   id         Int       @id @default(autoincrement())
@@ -105,15 +124,23 @@ model reviews {
 
 model admins {
   id            Int       @id @default(autoincrement())
-  email         String    @unique @db.VarChar(255)
+  name          String    @unique @db.VarChar(255)
   password_hash String    @db.VarChar(255)
   role          String    @db.VarChar(50)
   created_at    DateTime? @default(now()) @db.Timestamp(6)
   updated_at    DateTime? @default(now()) @db.Timestamp(6)
+  reports       reports[]
+  payments      payments[] @relation("ManagerPayments")  // Add this relation field
 }
+
 
 model location {
   id           Int    @id @default(autoincrement())
   deliveryprice Int    // Доставка цена
+  name         String // Название
+}
+
+model hotels {
+  id           Int    @id @default(autoincrement())
   name         String // Название
 }

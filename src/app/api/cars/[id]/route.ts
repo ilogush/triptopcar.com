@@ -3,6 +3,24 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params; // Получаем id из params
+    const body = await request.json(); // Получаем данные из тела запроса
+
+    // Обновляем запись в базе данных
+    const updatedCar = await prisma.cars.update({
+      where: { id: parseInt(id) }, // Находим машину по id
+      data: body, // Данные для обновления
+    });
+
+    return NextResponse.json(updatedCar); // Возвращаем обновленную машину
+  } catch (error) {
+    console.error("Error updating car:", error);
+    return NextResponse.json({ error: "Failed to update car" }, { status: 500 });
+  }
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params; // Awaiting params to get id
@@ -23,7 +41,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> } // Awaiting params to get id
+  { params }: { params: Promise<{ id: string }> }, // Awaiting params to get id
 ) {
   try {
     const { id } = await params; // Awaiting params to get id
@@ -33,9 +51,6 @@ export async function DELETE(
     return NextResponse.json(car);
   } catch (error) {
     console.error("Error deleting car:", error);
-    return NextResponse.json(
-      { error: 'Failed to delete car' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to delete car" }, { status: 500 });
   }
 }

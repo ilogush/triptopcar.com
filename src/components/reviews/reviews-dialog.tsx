@@ -6,8 +6,11 @@ import * as z from "zod";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
+import { Car } from "../data-table/columns";
 
 // Схема валидации для модели reviews
 const reviewSchema = z.object({
@@ -19,6 +22,7 @@ const reviewSchema = z.object({
 
 export function ReviewsDialog({ open, onOpenChange, review, onClose }: any) {
   const { toast } = useToast();
+  const [cars, setCars] = useState<Car[]>([]);
 
   const form = useForm({
     resolver: zodResolver(reviewSchema),
@@ -29,6 +33,24 @@ export function ReviewsDialog({ open, onOpenChange, review, onClose }: any) {
       rating: null,
     },
   });
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const carRes = await fetch("/api/cars");
+        const carData = await carRes.json();
+
+        if (Array.isArray(carData.cars)) {
+          setCars(carData.cars);
+        } else {
+          console.error("Полученные данные не являются массивом:", carData);
+          setCars([]); // Устанавливаем пустой массив в случае ошибки
+        }
+      } catch (err) {}
+    }
+
+    fetchData();
+  }, []);
 
   const onSubmit = async (data: any) => {
     try {
@@ -63,22 +85,34 @@ export function ReviewsDialog({ open, onOpenChange, review, onClose }: any) {
           <DialogTitle>{review ? "Edit Review" : "Add New Review"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Car ID */}
+          <form
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
+            {/* Car Selector */}
             <FormField
               control={form.control}
               name="car_id"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Car ID</FormLabel>
+                  <FormLabel>Select Car</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      step="1"
-                      placeholder="Enter car ID"
-                      onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                    />
+                    <Select
+                      value={field.value ? String(field.value) : ""}
+                      onValueChange={(value) => field.onChange(Number(value))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a car" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {cars.map((car) => (
+                          <SelectItem key={car.id} value={String(car.id)}>
+                            {car.brand} {car.model}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -120,7 +154,15 @@ export function ReviewsDialog({ open, onOpenChange, review, onClose }: any) {
                 <FormItem>
                   <FormLabel>Rating</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" step="1" min="1" max="5" placeholder="Enter rating (1-5)" />
+                    <Input
+                      {...field}
+                      type="number"
+                      step="1"
+                      min="1"
+                      max="5"
+                      placeholder="Enter rating (1-5)"
+                      onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

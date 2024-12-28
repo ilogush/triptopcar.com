@@ -4,11 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Home() {
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("manager");
   const [message, setMessage] = useState("");
-  const router = useRouter(); // Используем useRouter для редиректа
+  const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +17,7 @@ export default function Home() {
       const response = await fetch(`/api/admin`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ name, password, role }),
       });
 
       if (!response.ok) {
@@ -28,13 +28,12 @@ export default function Home() {
       localStorage.setItem("token", token);
       setMessage("Login successful!");
 
-      // Редирект на основе роли
+      // Редирект на вкладки, доступные для менеджера
       if (role === "manager") {
-        router.push("/admin/manager/dashboard/contracts"); // Страница для админа
+        router.push("/admin/manager/dashboard/contracts");
       } else if (role === "owner") {
-        router.push("/admin/owner/dashboard/cars"); // Страница для владельца
+        router.push("/admin/owner/dashboard/cars");
       }
-
     } catch (err) {
       console.log(err);
       setMessage("Login failed, please check your credentials.");
@@ -61,10 +60,10 @@ export default function Home() {
         }}
       >
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Name"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           required
           style={{
             width: "300px",
@@ -93,18 +92,12 @@ export default function Home() {
             width: "300px",
             padding: "0.5rem",
             borderRadius: "5px",
-            border: "1px solid #007BFF", // Синий цвет границы
-            backgroundColor: "#F9F9F9", // Светло-серый фон
-            color: "#333", // Темный текст
+            border: "1px solid #007BFF",
+            backgroundColor: "#F9F9F9",
+            color: "#333",
             fontSize: "1rem",
-            appearance: "none", // Убирает стандартные стрелки на некоторых браузерах
-            cursor: "pointer", // Указывает, что это элемент для взаимодействия
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = "#0056b3"; // Темно-синий цвет при наведении
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = "#007BFF"; // Возвращаем синий цвет
+            appearance: "none",
+            cursor: "pointer",
           }}
         >
           <option value="manager">Manager</option>

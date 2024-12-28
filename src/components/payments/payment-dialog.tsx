@@ -9,23 +9,45 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
+import { jwtDecode } from "jwt-decode";
 
 // Схема валидации для модели payments
 const paymentSchema = z.object({
   contract_id: z.number().int().positive().nullable().optional(), // Contract ID может быть nullable
   payment_type: z.string().min(1, "Payment type is required").max(50, "Payment type must be less than 50 characters"),
   amount: z.string().regex(/^\d+(\.\d{1,2})?$/, { message: "Enter a valid amount (e.g. 100.00)" }),
-  currency: z.string().max(3, "Currency code must be 3 characters").default("USD"),
+  currency: z.string().max(3, "Currency code must be 3 characters").default("THB"),
+  car_number: z.string().max(20, "Car number must be less than 20 characters").optional(), // Добавлено поле car_number
   created_at: z
     .string()
     .refine((val) => !isNaN(Date.parse(val)), {
       message: "Enter a valid date",
     })
     .optional(),
+  payment_sign: z.boolean().default(true), // Добавляем поле для оплаты
+  status: z
+    .enum(["ACCEPTED", "NOT_ACCEPTED"], {
+      errorMap: () => ({ message: "Status must be either ACCEPTED or NOT_ACCEPTED" }),
+    })
+    .default("NOT_ACCEPTED"), // Статус по умолчанию - "NOT_ACCEPTED"
 });
 
 export function PaymentDialog({ open, onOpenChange, payment, onClose }: any) {
   const { toast } = useToast();
+  const [managerId, setManagerId] = useState<number>();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token); // Декодируем токен
+        setManagerId(decoded.id);
+      } catch (error) {
+        console.error("Error decoding token", error);
+      }
+    }
+  }, []);
 
   const form = useForm({
     resolver: zodResolver(paymentSchema),
@@ -33,17 +55,23 @@ export function PaymentDialog({ open, onOpenChange, payment, onClose }: any) {
       contract_id: null,
       payment_type: "",
       amount: "",
-      currency: "USD",
-      created_at: new Date().toISOString().split("T")[0], // Текущая дата
+      currency: "THB",
+      car_number: "", // Добавлено поле car_number
+      created_at: payment?.created_at
+        ? new Date(payment.created_at).toISOString().split("T")[0]
+        : new Date().toISOString().split("T")[0],
+      payment_sign: true, // Устанавливаем значение по умолчанию
+      status: "NOT_ACCEPTED", // Значение по умолчанию для статуса
     },
   });
 
   const onSubmit = async (data: any) => {
     try {
-      // Преобразование данных для сохранения
+      // Если это обновление, сохраняем старого менеджера
       const preparedData = {
         ...data,
-        amount: parseFloat(data.amount), // Конвертация строки в Decimal
+        amount: parseFloat(data.amount),
+        manager_id: payment?.manager_id || managerId, // Сохраняем старого менеджера, если это обновление
       };
 
       const response = await fetch(`/api/payments${payment ? `/${payment.id}` : ""}`, {
@@ -79,7 +107,11 @@ export function PaymentDialog({ open, onOpenChange, payment, onClose }: any) {
           <DialogTitle>{payment ? "Edit Payment" : "Add New Payment"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
             {/* Contract ID */}
             <FormField
               control={form.control}
@@ -136,16 +168,30 @@ export function PaymentDialog({ open, onOpenChange, payment, onClose }: any) {
                 <FormItem>
                   <FormLabel>Currency</FormLabel>
                   <FormControl>
-                    <Select onValueChange={field.onChange} defaultValue={field.value || "USD"}>
+                    <Select onValueChange={field.onChange} value={field.value || "THB"}>
                       <SelectTrigger>
                         <SelectValue placeholder="Select currency" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="USD">USD</SelectItem>
-                        <SelectItem value="EUR">EUR</SelectItem>
-                        <SelectItem value="GBP">GBP</SelectItem>
+                        <SelectItem value="THB">THB (Thai Baht)</SelectItem>
+                        <SelectItem value="USD">USD (US Dollar)</SelectItem>
+                        <SelectItem value="RUB">RUB (Russian Ruble)</SelectItem>
                       </SelectContent>
                     </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            {/* Car Number */}
+            <FormField
+              control={form.control}
+              name="car_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Car Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="e.g. ABC1234" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -165,6 +211,42 @@ export function PaymentDialog({ open, onOpenChange, payment, onClose }: any) {
                 </FormItem>
               )}
             />
+            {/* Payment Sign */}
+            <FormField
+              control={form.control}
+              name="payment_sign"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Payment Sign</FormLabel>
+                  <FormControl>
+                    <input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status</FormLabel>
+                  <FormControl>
+                    <Select onValueChange={field.onChange} value={field.value || "NOT_ACCEPTED"}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="ACCEPTED">Accepted</SelectItem>
+                        <SelectItem value="NOT_ACCEPTED">Not Accepted</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <div className="flex justify-end space-x-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel

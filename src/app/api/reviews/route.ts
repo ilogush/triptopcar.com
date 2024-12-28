@@ -5,15 +5,19 @@ const prisma = new PrismaClient();
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-    const carId = searchParams.get('car_id'); // Получаем car_id из параметров запроса
+    const carId = searchParams.get("car_id"); // Получаем car_id из параметров запроса
+
+    let reviews;
 
     if (!carId) {
-      return NextResponse.json({ error: "Car ID is required" }, { status: 400 });
+      // Если car_id не указан, возвращаем все отзывы
+      reviews = await prisma.reviews.findMany();
+    } else {
+      // Если car_id указан, фильтруем отзывы
+      reviews = await prisma.reviews.findMany({
+        where: { car_id: parseInt(carId, 10) }, // Безопасное преобразование car_id в число
+      });
     }
-
-    const reviews = await prisma.reviews.findMany({
-      where: { car_id: parseInt(carId) }, // Фильтруем по car_id
-    });
 
     return NextResponse.json(reviews);
   }

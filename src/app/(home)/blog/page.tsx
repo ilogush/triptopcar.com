@@ -1,3 +1,4 @@
+//LOCALHOSH/BLOG
 export default function Blog() {
   return (
     <section className="container mx-auto -mt-6 rounded-2xl bg-white p-4 ">

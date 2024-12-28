@@ -8,20 +8,25 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { useEffect } from "react";
 
-// Схема валидации
 const carSchema = z.object({
   year: z.string().regex(/^\d{4}$/, "Year must be a valid 4-digit year."),
   car_body_type: z.string().min(2, "Body type is required."),
   fuel_type: z.string().min(2, "Fuel type is required."),
-  price_per_day: z.number().min(1, "Price per day must be at least 1."),
-  image_url: z.string(), // Убрана валидация URL
+  price_per_day: z.preprocess((val) => Number(val), z.number().min(1, "Price per day must be at least 1")),
+  image_url: z.string(),
   engine_capacity: z.string().nullable().optional(),
-  seats_quantity: z.number().min(1, "Seats quantity must be at least 1."),
-  deposit: z.number().min(0, "Deposit must be at least 0."),
+  seats_quantity: z.preprocess((val) => Number(val), z.number().min(1, "Seats quantity must be at least 1")),
+  deposit: z.preprocess((val) => Number(val), z.number().min(0, "Deposit must be at least 0")),
   transmission_type: z.string().min(2, "Transmission type is required."),
+  car_number: z.string().min(2, "Car number is required."),
+  color: z.string().min(2, "Color is required."),
   brand: z.string().min(2, "Brand must be at least 2 characters long."),
   model: z.string().min(2, "Model must be at least 2 characters long."),
+  ode: z.preprocess((val) => (val ? Number(val) : null), z.number().nullable().optional()),
+  oil_last_change: z.string().nullable().optional(),
+  is_available: z.boolean().optional().default(true),
 });
 
 export function CarDialog({ open, onOpenChange, car, onClose }: any) {
@@ -40,33 +45,71 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
       transmission_type: "",
       brand: "",
       model: "",
+      car_number: "",
+      color: "",
+      ode: null,
+      oil_last_change: "",
+      is_available: true,
     },
   });
 
+  useEffect(() => {
+    if (car) {
+      form.reset({
+        ...car,
+        oil_last_change: car.oil_last_change ? new Date(car.oil_last_change).toISOString().split('T')[0] : "",
+      });
+    } else {
+      form.reset({
+        year: "",
+        car_body_type: "",
+        fuel_type: "",
+        price_per_day: 0,
+        image_url: "",
+        engine_capacity: "",
+        seats_quantity: 1,
+        deposit: 0,
+        transmission_type: "",
+        brand: "",
+        model: "",
+        car_number: "",
+        color: "",
+        ode: null,
+        oil_last_change: "",
+        is_available: true,
+      });
+    }
+  }, [car, form]);
+
   const onSubmit = async (data: any) => {
-    // Преобразуем строки в числа там, где это необходимо
     const transformedData = {
       ...data,
-      price_per_day: Number(data.price_per_day), // Преобразование в число
-      seats_quantity: Number(data.seats_quantity), // Преобразование в число
-      deposit: Number(data.deposit), // Преобразование в число
+      price_per_day: Number(data.price_per_day),
+      seats_quantity: Number(data.seats_quantity),
+      deposit: Number(data.deposit),
+      ode: data.ode ? Number(data.ode) : null,
+      oil_last_change: data.oil_last_change ? new Date(data.oil_last_change).toISOString() : null,
+      is_available: data.is_available ?? true,
     };
+
     try {
       const response = await fetch(`/api/cars${car ? `/${car.id}` : ""}`, {
         method: car ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(transformedData),
       });
 
       if (!response.ok) throw new Error("Failed to save car");
 
+      const updatedCar = await response.json();
+
       toast({
         title: car ? "Car updated" : "Car created",
         description: car ? "The car has been successfully updated." : "The car has been successfully created.",
       });
-      onClose();
+
+      form.reset(updatedCar);
+      onClose(updatedCar);
     } catch (error) {
       toast({
         title: "Error",
@@ -83,7 +126,7 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
           <DialogTitle>{car ? "Edit Car" : "Add New Car"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form style={{ maxHeight: "80vh", overflowY: "auto" }} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg shadow-md">
             <FormField
               control={form.control}
               name="brand"
@@ -110,7 +153,19 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
                 </FormItem>
               )}
             />
-
+            <FormField
+              control={form.control}
+              name="is_available"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Available</FormLabel>
+                  <FormControl>
+                    <Input type="checkbox" checked={field.value} onChange={(e) => field.onChange(e.target.checked)} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="year"
@@ -196,11 +251,7 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
                 <FormItem>
                   <FormLabel>Seats Quantity</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      onChange={(e) => field.onChange(Number(e.target.value) || 0)} // Преобразование в число
-                    />
+                    <Input {...field} type="number" onChange={(e) => field.onChange(Number(e.target.value) || 0)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -213,11 +264,7 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
                 <FormItem>
                   <FormLabel>Deposit</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      onChange={(e) => field.onChange(Number(e.target.value) || 0)} // Преобразование в число
-                    />
+                    <Input {...field} type="number" onChange={(e) => field.onChange(Number(e.target.value) || 0)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -236,12 +283,61 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
                 </FormItem>
               )}
             />
-            <div className="flex justify-end space-x-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit">Save</Button>
-            </div>
+            <FormField
+              control={form.control}
+              name="color"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Color</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="car_number"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Car Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="ode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Mileage (Odometer)</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="number" onChange={(e) => field.onChange(Number(e.target.value) || 0)} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="oil_last_change"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Last Oil Change Date</FormLabel>
+                  <FormControl>
+                    <Input {...field} type="date" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button type="submit" className="w-full">
+              {car ? "Update Car" : "Add Car"}
+            </Button>
           </form>
         </Form>
       </DialogContent>

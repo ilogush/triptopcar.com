@@ -84,7 +84,11 @@ export function ClientDialog({ open, onOpenChange, client, onClose }: any) {
           <DialogTitle>{client ? "Edit Client" : "Add New Client"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <form
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg  shadow-md"
+          >
             <FormField
               control={form.control}
               name="firstName"
@@ -184,10 +188,7 @@ export function ClientDialog({ open, onOpenChange, client, onClose }: any) {
                 <FormItem>
                   <FormLabel>Location ID</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                    />
+                    <Input {...field} onChange={(e) => field.onChange(Number(e.target.value) || 0)} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

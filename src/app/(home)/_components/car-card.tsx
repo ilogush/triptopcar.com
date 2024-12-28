@@ -14,21 +14,26 @@ import FuelIcon from "@/components/icons/fuel-icon";
 import clsx from "clsx";
 import SnowflakeIcon from "@/components/icons/snowflake";
 import { calculateDailyCost } from "@/hooks/useTotalPriceDay";
-
 export type Car = {
     id: number;
-    brand: string;
-    model: string;
-    year: string;
+    image_url: string;
     car_body_type: string;
-    fuel_type: string;
     price_per_day: number;
-    image_url: string; // Добавлено поле
-    engine_capacity?: string; // Поле, которое может быть необязательным
+    engine_capacity?: string;
+    fuel_type: string;
     seats_quantity: number;
     deposit: number;
+    year: string;
     transmission_type: string;
+    brand: string;
+    model: string;
+    car_number: string;
+    color: string;
+    oil_last_change?: Date; // Дата последней замены масла (опционально)
+    ode?: number; // Пробег (опционально)
+    is_available: boolean; // Наличие машины
   };
+
 
 
 const CarCard: FC<{ car: Car; className?: string }> = ({ car, className }) => {

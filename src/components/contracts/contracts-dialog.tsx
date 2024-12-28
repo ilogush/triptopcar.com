@@ -11,6 +11,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useEffect, useState } from "react";
 import { Car } from "../data-table/columns";
 import { Location } from "../locations/columns";
+import { jwtDecode } from "jwt-decode";
 
 // Схема валидации для модели contracts
 const contractSchema = z.object({
@@ -20,8 +21,6 @@ const contractSchema = z.object({
   rental_currency: z.string().length(3, "Rental currency must be 3 characters"),
   deposit_currency: z.string().length(3, "Deposit currency must be 3 characters"),
   pickup_location_id: z.number().int().nullable().optional(),
-  address_return: z.string().max(255, "Address return must be less than 255 characters"),
-  amount: z.coerce.number().positive("Enter a valid amount"),
   client_name: z.string().max(100, "Client name must be less than 100 characters"),
   client_passport_number: z.string().max(50, "Passport number must be less than 50 characters"),
   client_phone_number: z.string().max(20, "Phone number must be less than 20 characters"),
@@ -32,7 +31,6 @@ const contractSchema = z.object({
   dropoff_address: z.string().max(255, "Dropoff address must be less than 255 characters"),
   dropoff_location_id: z.number().int().nullable().optional(),
   full_insurance: z.boolean().optional(),
-  location_return: z.string().max(255, "Location return must be less than 255 characters"),
   manager: z.string().max(100, "Manager name must be less than 100 characters"),
   mileage_odo: z.number().int().positive("Mileage must be a positive number"),
   pickup_address: z.string().max(255, "Pickup address must be less than 255 characters"),
@@ -51,58 +49,106 @@ const contractSchema = z.object({
 export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
   const { toast } = useToast();
   const [cars, setCars] = useState<Car[]>([]);
+  const [name, setName] = useState("");
   const [location, setLocation] = useState<Location[]>([]);
+  const [managerId, setManagerId] = useState<number>();
+
   const form = useForm({
     resolver: zodResolver(contractSchema),
     defaultValues: contract || {
-      car_id: cars.length > 0 ? cars[0].id : null,
+      car_id: contract?.car_id || cars.length > 0 ? cars[0].id : null,
       rental_amount: 0,
-      rental_currency: "USD",
-      deposit_currency: "USD",
+      rental_currency: "THB",
+      deposit_currency: "THB",
       pickup_location_id: null,
-      address_return: "",
-      amount: 0,
       client_name: "",
       client_passport_number: "",
       client_phone_number: "",
       client_second_phone_number: "",
       client_surname: "",
-      date_end: "",
-      date_start: "",
+      date_start: contract?.date_start ? new Date(contract.date_start).toISOString().split("T")[0] : "",
+      date_end: contract?.date_end ? new Date(contract.date_end).toISOString().split("T")[0] : "",
       dropoff_address: "",
       dropoff_location_id: null,
       full_insurance: false,
-      location_return: "",
       manager: "",
       mileage_odo: 0,
       pickup_address: "",
       rental_deposit_amount: 0,
-      rental_deposit_currency: "USD",
-      time_return: null,
+      rental_deposit_currency: "THB",
+      time_return: contract?.time_return || null,
       status: "PENDING",
     },
   });
 
   const onSubmit = async (formData: any) => {
-    console.log("onSubmit called", formData);
+    if (!formData.car_id) {
+      toast({ title: "Error", description: "Car must be selected.", variant: "destructive" });
+      return;
+    }
+
+    if (!formData.date_start || !formData.date_end) {
+      toast({ title: "Error", description: "Both start and end dates are required.", variant: "destructive" });
+      return;
+    }
+
+    if (new Date(formData.date_start) > new Date(formData.date_end)) {
+      toast({
+        title: "Error",
+        description: "End date must be after the start date.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Дополнительные проверки для клиента и платежа
+    if (!formData.client_name || !formData.client_passport_number || !formData.client_phone_number) {
+      toast({
+        title: "Error",
+        description: "Client name, passport number, and phone number are required.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const selectedCar = cars.find((car) => car.id === formData.car_id);
+
+    if (selectedCar) {
+      const carOde = selectedCar.ode ?? 0; // Если ode undefined, используется 0 или другое значение по умолчанию
+      if (formData.mileage_odo < carOde) {
+        toast({
+          title: "Error",
+          description: `Mileage must be greater than the current mileage of the car (${carOde}).`,
+          variant: "destructive",
+        });
+        return;
+      }
+    } else {
+      toast({
+        title: "Error",
+        description: "Selected car is not found.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     try {
+      const selectedCar = cars.find((car) => car.id === formData.car_id);
+      const car_number = selectedCar ? selectedCar.car_number : null;
       // Подготовка данных для API
       const requestData = {
         contractData: {
+          car_id: formData.car_id,
           rental_amount: formData.rental_amount,
           rental_currency: formData.rental_currency,
           deposit_currency: formData.deposit_currency,
           pickup_location_id: formData.pickup_location_id,
-          address_return: formData.address_return,
-          amount: formData.amount,
           date_end: formData.date_end,
           date_start: formData.date_start,
           dropoff_address: formData.dropoff_address,
           dropoff_location_id: formData.dropoff_location_id,
           full_insurance: formData.full_insurance,
-          location_return: formData.location_return,
-          manager: formData.manager,
+          manager: name,
           mileage_odo: formData.mileage_odo,
           pickup_address: formData.pickup_address,
           rental_deposit_amount: formData.rental_deposit_amount,
@@ -120,9 +166,11 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
         paymentsData: [
           {
             payment_type: formData.payment_type || "Rental Payment", // Тип платежа
-            amount: formData.payment_amount || 0, // Сумма платежа
-            currency: formData.currency || "USD", // Валюта платежа
+            amount: formData.rental_amount || 0, // Сумма платежа
+            currency: formData.currency || "THB", // Валюта платежа
             created_at: formData.payment_date || new Date().toISOString(), // Дата платежа
+            car_number,
+            managerId,
           },
         ],
       };
@@ -155,6 +203,19 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded: any = jwtDecode(token); // Декодируем токен
+        setName(decoded.name); // Сохраняем имя в состояние
+        setManagerId(decoded.id);
+      } catch (error) {
+        console.error("Error decoding token", error);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     async function fetchData() {
       try {
         const carRes = await fetch("/api/cars");
@@ -184,6 +245,19 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
     }
   }, [open]);
 
+  useEffect(() => {
+    if (contract && name) {
+      form.reset({
+        ...contract,
+        car_id: contract.car_id || (cars.length > 0 ? cars[0].id : null),
+        date_start: contract.date_start ? new Date(contract.date_start).toISOString().split("T")[0] : "",
+        date_end: contract.date_end ? new Date(contract.date_end).toISOString().split("T")[0] : "",
+        time_return: contract.time_return ? new Date(contract.time_return).toISOString().slice(11, 16) : null,
+        manager: name || "",
+      });
+    }
+  }, [contract, cars, name, form]); // Добавлен 'name' как зависимость
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -191,7 +265,11 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
           <DialogTitle>{contract ? "Edit Contract" : "Add New Contract"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+            className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg  shadow-md"
+          >
             <FormField
               control={form.control}
               name="car_id"
@@ -202,20 +280,17 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
                     <select
                       style={{ color: "#333" }}
                       {...field}
-                      className="input"
-                      value={field.value || ""}
-                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || "")} // Преобразуем значение в число
+                      className="input w-[70%]"
+                      value={field.value ?? ""}
+                      onChange={(e) => field.onChange(parseInt(e.target.value, 10) || "")}
                     >
-                      {" "}
                       <option value="" style={{ color: "#333" }}>
                         Select Car
                       </option>
                       {cars.map((car: Car) => (
-                        <option
-                          key={car.id}
-                          value={car.id}
-                          style={{ color: "#333" }}
-                        >{`${car.brand} ${car.model}`}</option>
+                        <option key={car.id} value={car.id} style={{ color: "#333" }}>
+                          {`${car.brand} ${car.model} (${car.car_number})`} {/* Отображаем номер машины */}
+                        </option>
                       ))}
                     </select>
                   </FormControl>
@@ -311,7 +386,11 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
                 <FormItem>
                   <FormLabel>Rental Currency</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="USD" />
+                    <select {...field} style={{ color: "black" }}>
+                      <option value="THB">THB (Thai Baht)</option>
+                      <option value="USD">USD (US Dollar)</option>
+                      <option value="RUB">RUB (Russian Ruble)</option>
+                    </select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -410,67 +489,11 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
                 <FormItem>
                   <FormLabel>Deposit Currency</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g., USD" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Address Return */}
-            <FormField
-              control={form.control}
-              name="address_return"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address Return</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter return address" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Amount */}
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input {...field} type="number" placeholder="e.g., 150.00" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Location Return */}
-            <FormField
-              control={form.control}
-              name="location_return"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location Return</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter return location" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Manager */}
-            <FormField
-              control={form.control}
-              name="manager"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Manager</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Enter manager name" />
+                    <select {...field} style={{ color: "black" }}>
+                      <option value="THB">THB (Thai Baht)</option>
+                      <option value="USD">USD (US Dollar)</option>
+                      <option value="RUB">RUB (Russian Ruble)</option>
+                    </select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -520,13 +543,16 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
                 <FormItem>
                   <FormLabel>Rental Deposit Currency</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="e.g., USD" />
+                    <select {...field} style={{ color: "black" }}>
+                      <option value="THB">THB (Thai Baht)</option>
+                      <option value="USD">USD (US Dollar)</option>
+                      <option value="RUB">RUB (Russian Ruble)</option>
+                    </select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
             {/* Dates */}
             <FormField
               control={form.control}
@@ -561,12 +587,13 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
                 <FormItem>
                   <FormLabel>Return Time</FormLabel>
                   <FormControl>
-                    <Input {...field} type="time" />
+                    <Input {...field} type="time" value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             {/* Insurance */}
             <FormField
               control={form.control}

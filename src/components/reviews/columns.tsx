@@ -48,6 +48,11 @@ export const columns: ColumnDef<Review>[] = [
     cell: ({ row }) => row.getValue("review"),
   },
   {
+    accessorKey: "created_at",
+    header: "Date",
+    cell: ({ row }) => row.getValue("created_at"),
+  },
+  {
     accessorKey: "rating",
     header: "Rating",
     cell: ({ row }) => {

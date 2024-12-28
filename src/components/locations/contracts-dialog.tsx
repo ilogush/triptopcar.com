@@ -79,7 +79,11 @@ export function LocationDialog({ open, onOpenChange, location, onClose }: Locati
           <DialogTitle>{location ? "Edit Location" : "Add New Location"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="name"

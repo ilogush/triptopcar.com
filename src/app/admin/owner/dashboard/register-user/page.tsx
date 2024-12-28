@@ -4,7 +4,7 @@ import { withRole } from "@/app/utils/withRole";
 import { useState } from "react";
 
 function RegisterUserPage() {
-  const [email, setEmail] = useState("");
+  const [name, setName] = useState(""); // Заменили email на name
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("manager"); // Роль по умолчанию
   const [message, setMessage] = useState("");
@@ -18,7 +18,7 @@ function RegisterUserPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email, password, role }),
+        body: JSON.stringify({ name, password, role }), // Используем name вместо email
       });
 
       if (!response.ok) {
@@ -27,7 +27,7 @@ function RegisterUserPage() {
       }
 
       setMessage("User created successfully");
-      setEmail("");
+      setName(""); // Очистка поля name
       setPassword("");
       setRole("manager");
     } catch (error) {
@@ -38,14 +38,13 @@ function RegisterUserPage() {
 
   return (
     <div style={{ maxWidth: "500px", margin: "0 auto", padding: "2rem" }}>
-      <h2>Register New User</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Email:</label>
+          <label>Name:</label> {/* Заменили Email на Name */}
           <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="text" // Используем text для имени
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             required
             style={{ width: "100%", padding: "0.5rem", margin: "0.5rem 0" }}
           />
@@ -79,6 +78,5 @@ function RegisterUserPage() {
     </div>
   );
 }
-
 
 export default withRole(RegisterUserPage, "owner");

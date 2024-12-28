@@ -14,12 +14,13 @@ export type Client = {
 
 export const columns: ColumnDef<Client>[] = [
   {
-    accessorKey: "first_name", // Используйте соответствующие поля из модели Prisma
+    accessorKey: "first_name", // Указываем поле first_name
     header: "First Name",
+    cell: ({ row }) => `${row.getValue("first_name")} ${row.getValue("last_name")}`, // Объединяем имена в ячейке
   },
   {
-    accessorKey: "last_name", // Используйте соответствующие поля из модели Prisma
-    header: "Last Name",
+    accessorKey: "last_name", 
+    header: "last_name",
   },
   {
     accessorKey: "phone_1", // Используйте phone_1 из модели Prisma
@@ -27,8 +28,9 @@ export const columns: ColumnDef<Client>[] = [
   },
   {
     accessorKey: "passport_number", // Используйте passport_number из модели Prisma, если нужно
-    header: "Passport Number",
+    header: "Passport",
   },
+
   {
     id: "actions",
     cell: ({ row }) => <ClientActions client={row.original} />,

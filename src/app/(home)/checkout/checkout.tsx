@@ -53,6 +53,9 @@ const Checkout: React.FC<CheckoutProps> = ({ className }) => {
   useEffect(() => {
     if (loading) return; // Ждем завершения загрузки
 
+    if (!car || !car.is_available) {
+      notFound(); // Если автомобиль недоступен, перенаправляем на страницу 404
+    }
     if (
       !car ||
       !carId ||

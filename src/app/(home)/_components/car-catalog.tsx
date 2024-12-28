@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Select from "react-select";
 import CarCard, { Car } from "./car-card";
-import {  CarBodyType } from "@/typing/interfaces";
+import { CarBodyType } from "@/typing/interfaces";
 import { carTypes } from "../_data/carTypes.data";
 import dynamic from "next/dynamic";
 import clsx from "clsx";
@@ -65,14 +65,13 @@ const CarCatalog = () => {
 
   const carsForRender = cars
     .filter(
-      (car) =>
-        carTypesFilter.length === 0 || carTypesFilter.includes(car.car_body_type as any)
+      (car) => (carTypesFilter.length === 0 || carTypesFilter.includes(car.car_body_type as any)) && car.is_available, // Фильтруем по доступности
     )
     .sort(sortHandlers[sort?.value || "price-high-to-low"]);
 
   const toggleCarType = (type: CarBodyType) => {
-    setCarTypesFilter((prev) =>
-      prev.includes(type) ? [] : [type] // Если тип уже выбран, сбрасываем фильтр, иначе выбираем новый тип
+    setCarTypesFilter(
+      (prev) => (prev.includes(type) ? [] : [type]), // Если тип уже выбран, сбрасываем фильтр, иначе выбираем новый тип
     );
   };
 
@@ -98,7 +97,7 @@ const CarCatalog = () => {
               key={carType.id}
               className={clsx(
                 carTypesFilter.includes(carType.name as any) && "bg-tertiary-gray",
-                "max-xl:scale-90 max-md:w-full max-md:h-full"
+                "max-xl:scale-90 max-md:w-full max-md:h-full",
               )}
             >
               <button

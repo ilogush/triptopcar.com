@@ -6,16 +6,37 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Car, Users, FileText, MapPin, CreditCard, MessageSquare, Settings, Menu, UserPlus } from "lucide-react";
+import {
+  Car,
+  Users,
+  FileText,
+  MapPin,
+  CreditCard,
+  MessageSquare,
+  Settings,
+  Menu,
+  UserPlus,
+  Hotel,
+  RadioIcon,
+  CarIcon,
+} from "lucide-react";
 import { jwtDecode } from "jwt-decode";
 
-const menuItems = [
+const allMenuItems = [
+  { href: "/dashboard/cars", icon: CarIcon, label: "Cars" },
   { href: "/dashboard/clients", icon: Users, label: "Clients" },
   { href: "/dashboard/contracts", icon: FileText, label: "Contracts" },
+  { href: "/dashboard/hotels", icon: Hotel, label: "Hotels" },
   { href: "/dashboard/locations", icon: MapPin, label: "Locations" },
   { href: "/dashboard/payments", icon: CreditCard, label: "Payments" },
+  { href: "/dashboard/register-user", icon: UserPlus, label: "New User" },
+  { href: "/dashboard/reports", icon: RadioIcon, label: "Reports" },
   { href: "/dashboard/reviews", icon: MessageSquare, label: "Reviews" },
-  { href: "/dashboard/settings", icon: Settings, label: "Settings" },
+];
+
+const managerMenuItems = [
+  { href: "/dashboard/contracts", icon: FileText, label: "Contracts" },
+  { href: "/dashboard/reports", icon: RadioIcon, label: "Reports" },
 ];
 
 export default function Sidebar() {
@@ -25,6 +46,7 @@ export default function Sidebar() {
 
   // Получаем роль из локального хранилища
   const [role, setRole] = useState<string | null>(null);
+  const [name, setName] = useState<string | null>(null);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -32,6 +54,7 @@ export default function Sidebar() {
       try {
         const decoded: any = jwtDecode(token); // Декодируем токен
         setRole(decoded.role); // Сохраняем роль в состояние
+        setName(decoded.name); // Сохраняем имя в состояние
       } catch (error) {
         console.error("Invalid token", error);
         setRole(null);
@@ -47,14 +70,7 @@ export default function Sidebar() {
     }
   }, [role, router]);
 
-  // Условный элемент для `owner`
-  const isOwner = role === "owner"; // Вместо проверки pathname, можно использовать роль напрямую
-  const ownerMenuItem = {
-    href: "/dashboard/register-user",
-    icon: UserPlus,
-    label: "Register User",
-  };
-  const secondOwnerItem = { href: "/dashboard/cars", icon: Car, label: "Cars" };
+  const menuItems = role === "owner" ? allMenuItems : managerMenuItems;
 
   return (
     <div
@@ -70,25 +86,16 @@ export default function Sidebar() {
           <Menu className="h-5 w-5" />
         </Button>
       </div>
-      {!collapsed && <p className="text-lg font-semibold">{role}</p>}
+
+      {/* Условный рендеринг для имени и роли */}
+      {role !== null && name !== null && !collapsed && (
+        <p className="text-lg font-semibold">
+          {role} {name}
+        </p>
+      )}
 
       <nav className="space-y-2 p-2">
-        {isOwner && (
-          <Link
-            href={`/admin/owner${secondOwnerItem.href}`}
-            className={cn(
-              "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-colors",
-              pathname === secondOwnerItem.href
-                ? "bg-accent text-accent-foreground"
-                : "hover:bg-accent hover:text-accent-foreground",
-              collapsed && "justify-center",
-            )}
-          >
-            <secondOwnerItem.icon className="h-5 w-5" />
-            {!collapsed && <span>{secondOwnerItem.label}</span>}
-          </Link>
-        )}
-        {role !== null && menuItems.map((item) => (
+        {menuItems.map((item) => (
           <Link
             key={item.href}
             href={`/admin/${role}${item.href}`}
@@ -104,23 +111,6 @@ export default function Sidebar() {
             {!collapsed && <span>{item.label}</span>}
           </Link>
         ))}
-
-        {/* Условное добавление меню для owner */}
-        {isOwner && (
-          <Link
-            href={`/admin/owner${ownerMenuItem.href}`}
-            className={cn(
-              "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm transition-colors",
-              pathname === ownerMenuItem.href
-                ? "bg-accent text-accent-foreground"
-                : "hover:bg-accent hover:text-accent-foreground",
-              collapsed && "justify-center",
-            )}
-          >
-            <ownerMenuItem.icon className="h-5 w-5" />
-            {!collapsed && <span>{ownerMenuItem.label}</span>}
-          </Link>
-        )}
       </nav>
     </div>
   );

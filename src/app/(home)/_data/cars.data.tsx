@@ -264,7 +264,7 @@ export const cars: Car[] = [
     imageUrl: "/chevrolet_captiva.png",
     name: "Chevrolet Captiva",
     carBodyType: "SUV",
-    pricePerDay: 950,
+    pricePerDay: 1100,
     premiumExtraPrice: 550,
     engineCapacity: "1.5",
     year: "2021",

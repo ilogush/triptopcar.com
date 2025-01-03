@@ -116,7 +116,7 @@ export const cars: Car[] = [
     imageUrl: "/honda_civic.png",
     name: "Honda Civic",
     carBodyType: "Sedan",
-    pricePerDay: 1250,
+    pricePerDay: 1150,
     premiumExtraPrice: 700,
     engineCapacity: "2.0 Hybrid",
     year: "2024",

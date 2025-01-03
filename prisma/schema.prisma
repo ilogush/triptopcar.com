@@ -34,13 +34,12 @@ model cars {
   model             String      @db.VarChar(100)
   car_number        String      @default("") // Значение по умолчанию
   color             String      @db.VarChar(20)  // Цвет машины
-  oil_last_change   DateTime?   // Дата последней замены масла
+  oil_last_change   Int?
   ode               Int?        // Пробег
   is_available      Boolean     @default(true) // Наличие машины
   contracts         contracts[]
   reviews           reviews[]
 }
-
 
 model clients {
   id              Int         @id @default(autoincrement())

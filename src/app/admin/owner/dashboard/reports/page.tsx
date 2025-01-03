@@ -100,7 +100,7 @@ function ReportsPage() {
           <p>RUB: {RUB.toFixed(2)}</p>
           <Button onClick={() => setIsDialogOpen(true)} className="mt-4 md:mt-0">
             <Plus className="mr-2 h-4 w-4" />
-            Add Report
+            Add Payment
           </Button>
         </div>
       </div>

@@ -57,7 +57,7 @@ function ContractsPage() {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold">Contracts Management</h1>
+        <h1 className="text-3xl font-bold">Contracts</h1>
         <div className="flex gap-4">
           {/* Кнопка для переключения сортировки */}
           <div className="flex items-center space-x-4">

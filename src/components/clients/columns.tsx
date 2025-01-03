@@ -2,35 +2,61 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { ClientActions } from "./actions";
+import { format } from "date-fns";
 
 export type Client = {
   id: number;
-  first_name: string; // Изменено на first_name
-  last_name: string; // Изменено на last_name
-  phone_1: string; // Изменено на phone_1
-  phone_2?: string; // Изменено на phone_2, если это поле может быть необязательным
-  passport_number?: string; // Добавлено, если нужно
+  first_name: string;
+  last_name: string;
+  phone_1: string;
+  phone_2?: string;
+  passport_number?: string;
+  status: string;
+  location_id?: number;
+  created_at: Date;
 };
 
 export const columns: ColumnDef<Client>[] = [
   {
-    accessorKey: "first_name", // Указываем поле first_name
-    header: "First Name",
-    cell: ({ row }) => `${row.getValue("first_name")} ${row.getValue("last_name")}`, // Объединяем имена в ячейке
+    accessorKey: "id",
+    header: "ID",
+    size: 50,
   },
   {
-    accessorKey: "last_name", 
-    header: "last_name",
+    accessorFn: (row) => `${row.first_name} ${row.last_name}`,
+    header: "Name",
   },
   {
-    accessorKey: "phone_1", // Используйте phone_1 из модели Prisma
+    accessorKey: "phone_1",
     header: "Phone",
   },
   {
-    accessorKey: "passport_number", // Используйте passport_number из модели Prisma, если нужно
+    accessorKey: "passport_number",
     header: "Passport",
   },
-
+  {
+    accessorKey: "location_id",
+    header: "Location",
+  },
+  {
+    accessorKey: "status",
+    header: "Status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as string;
+      const statusColors: Record<string, string> = {
+        active: "bg-green-100 text-green-800",
+        inactive: "bg-red-100 text-red-800",
+        // Добавьте другие статусы по необходимости
+      };
+      return (
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[status] || "bg-gray-100 text-gray-800"}`}
+        >
+          {status}
+        </span>
+      );
+    },
+  },
   {
     id: "actions",
     cell: ({ row }) => <ClientActions client={row.original} />,

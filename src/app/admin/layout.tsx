@@ -17,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <div className="flex h-screen">
         <Sidebar />
         <main className="flex-1 overflow-y-auto bg-background p-8">{children}</main>
+        
       </div>
       <Toaster />
     </ThemeProvider>

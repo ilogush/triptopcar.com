@@ -8,56 +8,63 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEffect, useState } from "react";
 
-// Validation schema with detailed messages
 const clientSchema = z.object({
   firstName: z.string().min(2, { message: "First name must be at least 2 characters long." }),
   lastName: z.string().min(2, { message: "Last name must be at least 2 characters long." }),
-  phone: z.string().min(10, { message: "Phone number must be at least 10 characters long." }),
-  licenseNumber: z.string().min(5, { message: "License number must be at least 5 characters long." }),
-  passportNumber: z.string().optional(), // паспортный номер (опционально)
-  phone2: z.string().optional(), // второй телефон (опционально)
-  status: z.string().optional(), // статус (опционально)
-  locationId: z.number().optional(), // идентификатор локации (опционально)
-  hotelName: z.string().optional(), // имя отеля (опционально)
+  phone1: z.string().min(10, { message: "Phone number must be at least 10 characters long." }),
+  phone2: z.string().optional(),
+  passportNumber: z.string().optional(),
+  status: z.string(),
+  locationId: z.string(),
+  hotelName: z.string().optional(),
 });
 
 export function ClientDialog({ open, onOpenChange, client, onClose }: any) {
   const { toast } = useToast();
+  const [locations, setLocations] = useState([]);
+
   const form = useForm({
     resolver: zodResolver(clientSchema),
     defaultValues: client || {
       firstName: "",
       lastName: "",
-      phone: "",
-      licenseNumber: "",
-      passportNumber: "",
+      phone1: "",
       phone2: "",
+      passportNumber: "",
       status: "active",
-      locationId: 0,
+      locationId: "",
       hotelName: "",
     },
   });
 
+  useEffect(() => {
+    const fetchLocations = async () => {
+      const response = await fetch("/api/locations");
+      const data = await response.json();
+      setLocations(data);
+    };
+    fetchLocations();
+  }, []);
+
   const onSubmit = async (data: any) => {
-    // Преобразование данных для соответствия модели базы данных
     const transformedData = {
       first_name: data.firstName,
       last_name: data.lastName,
-      phone_1: data.phone,
+      phone_1: data.phone1,
       phone_2: data.phone2 || null,
-      passport_number: data.passportNumber || "",
-      status: data.status || "active",
-      location_id: data.locationId ? Number(data.locationId) : 0, // Ensure it's a number, fallback to 0 if empty
-      hotel_name: data.hotelName || "",
+      passport_number: data.passportNumber || null,
+      status: data.status,
+      location_id: parseInt(data.locationId, 10),
+      hotel_name: data.hotelName || null,
     };
 
     try {
       const response = await fetch(`/api/clients${client ? `/${client.id}` : ""}`, {
         method: client ? "PUT" : "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(transformedData),
       });
 
@@ -85,9 +92,8 @@ export function ClientDialog({ open, onOpenChange, client, onClose }: any) {
         </DialogHeader>
         <Form {...form}>
           <form
-            style={{ maxHeight: "80vh", overflowY: "auto" }}
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg  shadow-md"
+            className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             <FormField
               control={form.control}
@@ -117,10 +123,10 @@ export function ClientDialog({ open, onOpenChange, client, onClose }: any) {
             />
             <FormField
               control={form.control}
-              name="phone"
+              name="phone1"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Phone</FormLabel>
+                  <FormLabel>Phone 1</FormLabel>
                   <FormControl>
                     <Input {...field} type="tel" />
                   </FormControl>
@@ -130,18 +136,17 @@ export function ClientDialog({ open, onOpenChange, client, onClose }: any) {
             />
             <FormField
               control={form.control}
-              name="licenseNumber"
+              name="phone2"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>License Number</FormLabel>
+                  <FormLabel>Phone 2</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} type="tel" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            {/* Новые поля */}
             <FormField
               control={form.control}
               name="passportNumber"
@@ -157,39 +162,38 @@ export function ClientDialog({ open, onOpenChange, client, onClose }: any) {
             />
             <FormField
               control={form.control}
-              name="phone2"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Second Phone</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="status"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Status</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} placeholder="Enter status" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="locationId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Location ID</FormLabel>
-                  <FormControl>
-                    <Input {...field} onChange={(e) => field.onChange(Number(e.target.value) || 0)} />
-                  </FormControl>
+                  <FormLabel>Location</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select location" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {locations.map((location: any) => (
+                        <SelectItem key={location.id} value={location.id.toString()}>
+                          {location.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
@@ -207,7 +211,7 @@ export function ClientDialog({ open, onOpenChange, client, onClose }: any) {
                 </FormItem>
               )}
             />
-            <div className="flex justify-end space-x-2">
+            <div className="col-span-2 flex justify-end space-x-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>

@@ -55,6 +55,10 @@ export async function POST(request: Request) {
         where: { name },
       });
 
+      if (!name || name.trim() === "") {
+        return null; // Возвращаем null, если имя отеля не указано
+      }
+
       if (existingHotel) {
         return existingHotel.id; // Если отель уже существует, возвращаем его ID
       }

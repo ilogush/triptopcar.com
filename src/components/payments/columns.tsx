@@ -2,6 +2,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { PaymentActions } from "./actions";
 import { AdminName } from "./admin-name";
 
+export type PaymentsStatus = "NOT_ACCEPTED" | "ACCEPTED";
 export type Payment = {
   id: number;
   contract_id: number;
@@ -40,10 +41,10 @@ export const columns: ColumnDef<Payment>[] = [
     header: "Amount",
     cell: ({ row }) => {
       const amount = row.getValue("amount") as number;
-      return amount.toLocaleString(); // Это просто отформатирует число без валюты
+      const currency = row.original.currency || "THB";
+      return `${currency} ${amount.toLocaleString()}`;
     },
   },
-
   {
     accessorKey: "created_at",
     header: "Payment Date",
@@ -57,14 +58,9 @@ export const columns: ColumnDef<Payment>[] = [
     header: "Payment Type",
   },
   {
-    accessorKey: "currency",
-    header: "Currency",
-  },
-  {
     accessorKey: "manager_id",
     header: "manager_id",
   },
-
   {
     accessorKey: "manager_name",
     header: "Admin Name",
@@ -73,6 +69,27 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: "status",
     header: "status",
+    cell: ({ row }) => {
+      const status = row.getValue("status") as PaymentsStatus;
+
+      const toggleStatus = () => {
+        console.log("click");
+      };
+
+      const statusColors: Record<PaymentsStatus, string> = {
+        ACCEPTED: "bg-green-100 text-green-800",
+        NOT_ACCEPTED: "bg-red-100 text-red-800",
+      };
+
+      return (
+        <span
+          onClick={toggleStatus}
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[status]}`}
+        >
+          {status}
+        </span>
+      );
+    },
   },
   {
     id: "actions",

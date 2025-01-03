@@ -268,7 +268,7 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
           <form
             onSubmit={form.handleSubmit(onSubmit)}
             style={{ maxHeight: "80vh", overflowY: "auto" }}
-            className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg  shadow-md"
+            className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-6"
           >
             <FormField
               control={form.control}
@@ -289,7 +289,8 @@ export function ContractDialog({ open, onOpenChange, contract, onClose }: any) {
                       </option>
                       {cars.map((car: Car) => (
                         <option key={car.id} value={car.id} style={{ color: "#333" }}>
-                          {`${car.brand} ${car.model} (${car.car_number})`} {/* Отображаем номер машины */}
+                          {`${car.brand} ${car.model} (${car.car_number})`}
+                          {car.is_available ? "🟢" : "🔴"}
                         </option>
                       ))}
                     </select>

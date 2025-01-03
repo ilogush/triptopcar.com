@@ -25,7 +25,7 @@ const carSchema = z.object({
   brand: z.string().min(2, "Brand must be at least 2 characters long."),
   model: z.string().min(2, "Model must be at least 2 characters long."),
   ode: z.preprocess((val) => (val ? Number(val) : null), z.number().nullable().optional()),
-  oil_last_change: z.string().nullable().optional(),
+  oil_last_change: z.preprocess((val) => (val ? Number(val) : null), z.number().nullable().optional()),
   is_available: z.boolean().optional().default(true),
 });
 
@@ -48,7 +48,7 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
       car_number: "",
       color: "",
       ode: null,
-      oil_last_change: "",
+      oil_last_change: 0,
       is_available: true,
     },
   });
@@ -57,7 +57,7 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
     if (car) {
       form.reset({
         ...car,
-        oil_last_change: car.oil_last_change ? new Date(car.oil_last_change).toISOString().split('T')[0] : "",
+        oil_last_change: car.oil_last_change || null,
       });
     } else {
       form.reset({
@@ -75,7 +75,7 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
         car_number: "",
         color: "",
         ode: null,
-        oil_last_change: "",
+        oil_last_change: null,
         is_available: true,
       });
     }
@@ -88,7 +88,7 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
       seats_quantity: Number(data.seats_quantity),
       deposit: Number(data.deposit),
       ode: data.ode ? Number(data.ode) : null,
-      oil_last_change: data.oil_last_change ? new Date(data.oil_last_change).toISOString() : null,
+      oil_last_change: data.oil_last_change ? Number(data.oil_last_change) : null,
       is_available: data.is_available ?? true,
     };
 
@@ -126,7 +126,11 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
           <DialogTitle>{car ? "Edit Car" : "Add New Car"}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
-          <form style={{ maxHeight: "80vh", overflowY: "auto" }} onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg shadow-md">
+          <form
+            style={{ maxHeight: "80vh", overflowY: "auto" }}
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-6 p-4 sm:p-6 md:p-8 rounded-lg shadow-md grid grid-cols-1 md:grid-cols-2 gap-6"
+          >
             <FormField
               control={form.control}
               name="brand"
@@ -327,14 +331,19 @@ export function CarDialog({ open, onOpenChange, car, onClose }: any) {
               name="oil_last_change"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Last Oil Change Date</FormLabel>
+                  <FormLabel>Oil Change (km)</FormLabel>
                   <FormControl>
-                    <Input {...field} type="date" />
+                    <Input
+                      {...field}
+                      type="number"
+                      onChange={(e) => field.onChange(e.target.value ? Number(e.target.value) : null)}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
             <Button type="submit" className="w-full">
               {car ? "Update Car" : "Add Car"}
             </Button>

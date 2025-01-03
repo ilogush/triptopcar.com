@@ -29,7 +29,7 @@ export type Car = {
     model: string;
     car_number: string;
     color: string;
-    oil_last_change?: Date; // Дата последней замены масла (опционально)
+    oil_last_change?: number; // Дата последней замены масла (опционально)
     ode?: number; // Пробег (опционально)
     is_available: boolean; // Наличие машины
   };

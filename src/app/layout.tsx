@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import dynamic from "next/dynamic";
 import Provider from "./provider";
+const ClientLayout = dynamic(() => import("./client-layout"));
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -80,9 +80,8 @@ export default function RootLayout({
         />
         {/* End Google Tag Manager (noscript) */}
         <Provider>
-          <Header />
-          {children}
-          <Footer />
+        <ClientLayout>{children}</ClientLayout> {/* Используем ClientLayout */}
+
         </Provider>
       </body>
     </html>
